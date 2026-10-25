@@ -2,6 +2,7 @@
 
 Pushes to `main` build and deploy through `.github/workflows/deploy.yml`.
 The workflow can also be run from GitHub Actions with **Run workflow** on `main`.
+The production website is <https://glory.taidge.com/>.
 
 ## One-time account setup
 
@@ -19,10 +20,38 @@ Never commit credentials. The workflow exposes the token only to its deployment 
 The first deployment creates a **Direct Upload** Pages project if it does not
 exist, with `main` as the production branch. An existing project must use `main`
 as its production branch. Every successful deployment updates the project's
-`pages.dev` production address and any custom domains attached to it.
+custom domain, `glory.taidge.com`.
 
-Set up your domain in **Workers & Pages → your project → Custom domains**.
-No domain is hardcoded into the generated website.
+`glory.taidge.com` is attached in **Workers & Pages → glory-website → Custom
+domains**, with a `glory` CNAME in the Cloudflare-managed `taidge.com` zone
+pointing to `glory-website-3fn.pages.dev`. Generated asset/navigation URLs remain
+root-relative.
+
+## Redirect the default Pages address
+
+The account-level Bulk Redirect List `glory_pages_to_custom_domain` redirects
+`glory-website-3fn.pages.dev` to `https://glory.taidge.com/` with status **301**.
+Its rule is named `Glory Pages to official domain`.
+
+The importable list is recorded in [pages-dev-redirects.csv](pages-dev-redirects.csv).
+It has no header row; columns are source URL, target URL, status code, preserve
+query string, include subdomains, subpath matching, and preserve path suffix.
+All four boolean options are enabled, so paths, query strings, and Pages preview
+subdomains redirect to the corresponding official URL. For example:
+
+```text
+https://glory-website-3fn.pages.dev/docs/web/?from=old
+→ https://glory.taidge.com/docs/web/?from=old
+```
+
+Manage the list and its enabled rule in the Cloudflare account's **Bulk
+Redirects** dashboard. This is account-level configuration, independent of site
+deployments. The CSV is a recovery/import reference, not an asset copied into
+`dist`; GitHub Actions does not apply account-level redirect rules. The existing
+Pages-only deployment token does not need broader permissions.
+
+Pages `_redirects` does not support domain-level redirects. Do not add a blanket
+`/*` redirect there: it would also redirect requests on the official domain.
 
 ## Build and dependency policy
 
@@ -67,4 +96,5 @@ instead of marking old JS/WASM as immutable.
   only after those steps succeed.
 
 References: [Cloudflare CI upload](https://developers.cloudflare.com/pages/how-to/use-direct-upload-with-continuous-integration/),
-[custom domains](https://developers.cloudflare.com/pages/configuration/custom-domains/).
+[custom domains](https://developers.cloudflare.com/pages/configuration/custom-domains/),
+[Pages-to-custom-domain redirects](https://developers.cloudflare.com/pages/how-to/redirect-to-custom-domain/).

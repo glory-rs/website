@@ -23,7 +23,7 @@ The current checkout uses sibling path dependencies on `../glory` and `../sapid`
 ## Automatic deployment
 
 Pushes to `main` build and publish the production site at
-<https://glory-website-3fn.pages.dev/> through GitHub Actions and Cloudflare Pages.
+<https://glory.taidge.com/> through GitHub Actions and Cloudflare Pages.
 The workflow checks out the dependency revisions pinned in
 `deploy/dependencies.json`, runs native tests, and generates release HTML/WASM.
 See [deployment setup and troubleshooting](deploy/README.md).
