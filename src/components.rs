@@ -114,7 +114,10 @@ pub fn header(locale: Locale, current: Route) -> impl Widget {
             .fill((
                 view().class("header-inner").fill((
                     view().class("brand-wrap").fill((
-                        image().source("/assets/glory.svg").decorative().class("brand-mark"),
+                        image()
+                            .source(crate::assets::media("glory.svg"))
+                            .decorative()
+                            .class("brand-mark"),
                         link(locale, "Glory", Route::Home, "brand"),
                     )),
                     view()
@@ -158,7 +161,7 @@ pub fn footer(locale: Locale) -> impl Widget {
     view().role(Role::ContentInfo).class("site-footer").fill((
         view().class("footer-inner").fill((
             view().class("footer-brand").fill((
-                image().source("/assets/glory.svg").decorative().class("footer-mark"),
+                image().source(crate::assets::media("glory.svg")).decorative().class("footer-mark"),
                 view().fill((
                     copy("footer-title", "Glory"),
                     copy("footer-tagline", locale.text("common-semantic-ui-handwritten-in-rust")),

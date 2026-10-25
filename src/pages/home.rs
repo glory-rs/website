@@ -114,7 +114,7 @@ pub fn home(locale: Locale) -> impl Widget {
                 view().class("hero-art").fill((
                     view().class("logo-orbit orbit-one"),
                     view().class("logo-orbit orbit-two"),
-                    image().source("/assets/glory.svg").alt("Glory").class("hero-logo"),
+                    image().source(crate::assets::media("glory.svg")).alt("Glory").class("hero-logo"),
                     copy("hero-art-caption", locale.text("home-build-beyond-the-browser")),
                 )),
             )),

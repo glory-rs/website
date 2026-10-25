@@ -41,6 +41,12 @@ pub fn head(route: SiteRoute) -> String {
 }
 
 pub fn document(route: SiteRoute, html: &str) -> String {
+    document_with_assets(route, html, "")
+}
+
+pub fn document_with_assets(route: SiteRoute, html: &str, assets: &str) -> String {
+    let icon = crate::assets::media("glory.ico");
+    let logo = crate::assets::media("glory.svg");
     format!(
         r##"<!doctype html>
 <html lang="{}">
@@ -50,15 +56,15 @@ pub fn document(route: SiteRoute, html: &str) -> String {
 <meta name="glory-render" content="ssr">
 {}
 <meta name="theme-color" content="#111225">
-<link rel="icon" href="/assets/glory.ico">
-<link rel="icon" type="image/svg+xml" href="/assets/glory.svg">
+<link rel="icon" href="{icon}">
+<link rel="icon" type="image/svg+xml" href="{logo}">
 <style data-gly-base="v1">{}</style>
-<link rel="stylesheet" href="/sapid.css">
-<link rel="stylesheet" href="/site.css">
+<link rel="stylesheet" href="{assets}/sapid.css">
+<link rel="stylesheet" href="{assets}/site.css">
 </head>
 <body>
 <div id="app">{html}</div>
-<script type="module">import init from '/glory_website.js'; await init(); window.gloryReady = true;</script>
+<script type="module">import init from '{assets}/glory_website.js'; await init(); window.gloryReady = true;</script>
 </body>
 </html>
 "##,

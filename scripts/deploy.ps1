@@ -9,9 +9,13 @@ if (-not $env:CLOUDFLARE_API_TOKEN -or -not $env:CLOUDFLARE_ACCOUNT_ID) {
 }
 if ($env:CLOUDFLARE_ACCOUNT_ID -notmatch '^[a-fA-F0-9]{32}$') { throw 'Invalid Cloudflare Account ID' }
 if ($ProjectName -notmatch '^[a-z0-9][a-z0-9-]{0,57}[a-z0-9]$') { throw 'Invalid Cloudflare Pages project name' }
-foreach ($file in @('index.html','404.html','glory_website.js','glory_website_bg.wasm','_headers')) {
+foreach ($file in @('index.html','404.html','asset-manifest.json','_headers')) {
     if (-not (Test-Path -LiteralPath (Join-Path $Directory $file) -PathType Leaf)) { throw "Missing deployment asset: $file" }
 }
+& python "$PSScriptRoot/site-assets.py" retain $Directory https://glory.taidge.org
+if ($LASTEXITCODE -ne 0) { throw 'Previous asset retention failed' }
+& python "$PSScriptRoot/site-assets.py" validate $Directory
+if ($LASTEXITCODE -ne 0) { throw 'Deployment asset validation failed' }
 $headers = @{ Authorization = "Bearer $env:CLOUDFLARE_API_TOKEN" }
 $endpoint = "https://api.cloudflare.com/client/v4/accounts/$env:CLOUDFLARE_ACCOUNT_ID/pages/projects"
 try {

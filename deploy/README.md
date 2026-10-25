@@ -78,7 +78,7 @@ and Playwright 1.60.0, with tools and browser downloads on D drive. It covers bo
 languages, hydration identity, language switching, document metadata, live
 controls, localized 404 responses, and four viewport widths. The
 generated site is also retained as the `website-dist` Actions artifact for
-seven days, including when the later deployment step fails. Build-only checks
+30 days, including when the later deployment step fails. Build-only checks
 do not require Cloudflare credentials.
 
 For a local production build with `wasm-bindgen` 0.2.129 on PATH:
@@ -96,8 +96,33 @@ top-level `404.html` and `/zh/404.html`; Cloudflare serves the nearest ancestor'
 missing-page document with a 404 status. Both languages are listed in
 `sitemap.xml` and connected by hreflang alternates. Do not add a
 catch-all SPA rewrite to `/index.html`, since hydration uses the matching route's
-SSR tree. Assets have stable filenames, so `_headers` requires revalidation
-instead of marking old JS/WASM as immutable.
+SSR tree. CSS, bindgen JS/WASM and snippets share an `assets-<content-hash>/` directory.
+Images/icons use a separate `media-<content-hash>/` directory computed before
+compilation, so browser and SSR builds embed the same URLs. Relative bindgen WASM
+and snippet imports stay inside their asset directory. A content change changes
+the URL; unchanged content keeps the same URL. No timestamp query is necessary.
+
+`_headers` gives both immutable directories `public, max-age=31536000, immutable`.
+Entry HTML and other unversioned files use Pages' default
+`public, max-age=0, must-revalidate` (ETag/304); `asset-manifest.json` uses `no-cache`.
+Do not add a global Cache-Control header: Pages merges matching rules, which would
+produce conflicting directives on immutable assets.
+
+Before each upload, `deploy.ps1` retrieves the previous production manifest and
+copies the last three distinct asset releases into the new deployment. Each file
+is verified against SHA-256 and size before upload. Limits are 25 MiB per file,
+500 files per release and 200 MiB overall. Failed downloads/integrity checks stop
+deployment. The first migration discovers the old loader/WASM/snippets/styles and
+media from the existing site and carries them forward as a legacy release.
+This retention works across fresh runners and does not depend on the expiry of
+Actions artifacts or Cloudflare's opportunistic old-asset cache. Retention is
+bounded by three previous releases; tabs older than that should reload.
+
+The `taidge.org` Cache Rule **Glory and Sapid origin browser caching** matches only
+`glory.taidge.org` and `sapid.taidge.org`, and respects origin Browser TTL. Keep
+HTML outside any Cache Everything/Edge TTL override. The zone's default 4-hour
+Browser TTL otherwise overrides short origin TTLs. Existing open tabs continue
+running their loaded version until the reader reloads or navigates to a new document.
 
 ## Troubleshooting
 

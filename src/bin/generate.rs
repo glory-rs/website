@@ -16,6 +16,14 @@ fn output_path(directory: &Path, route: SiteRoute) -> PathBuf {
 
 fn main() -> Result<(), Box<dyn Error>> {
     let directory = PathBuf::from(std::env::args().nth(1).ok_or("Expected an output directory")?);
+    let assets = std::env::args().nth(2).ok_or("Expected an immutable asset directory")?;
+    if !assets.starts_with("assets-")
+        || assets.len() != 27
+        || !assets[7..].bytes().all(|b| b.is_ascii_hexdigit())
+    {
+        return Err("Invalid immutable asset directory".into());
+    }
+    let assets = format!("/{assets}");
     if !directory.is_absolute() {
         return Err("The output directory must be absolute".into());
     }
@@ -26,7 +34,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             let snapshot = glory::ssr::snapshot(app(route))?;
             let path = output_path(&directory, route);
             fs::create_dir_all(path.parent().ok_or("Expected parent directory")?)?;
-            fs::write(&path, metadata::document(route, &snapshot.html))?;
+            fs::write(&path, metadata::document_with_assets(route, &snapshot.html, &assets))?;
             println!("Generated {}", path.display());
         }
     }

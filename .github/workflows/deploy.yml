@@ -21,6 +21,7 @@ env:
   CARGO_BUILD_JOBS: '2'
   TEMP: D:/BuildCache/glory-website/tmp
   TMP: D:/BuildCache/glory-website/tmp
+  PYTHONPYCACHEPREFIX: D:/BuildCache/glory-website/pycache
   npm_config_cache: D:/BuildCache/glory-website/npm
   WRANGLER_SEND_METRICS: 'false'
   RUST_VERSION: 1.98.0
@@ -118,6 +119,9 @@ jobs:
           }
           "$tools/$package" >> $env:GITHUB_PATH
 
+      - name: Verify immutable assets and release retention
+        run: python scripts/test-site-assets.py
+
       - name: Build production HTML and WASM
         run: ./scripts/build.ps1 -Release -BuildRoot $env:BUILD_ROOT
 
@@ -144,6 +148,8 @@ jobs:
             if (-not $ready) { throw 'Preview server did not start' }
             node tests/browser.cjs
             if ($LASTEXITCODE -ne 0) { throw 'Bilingual browser acceptance failed' }
+            node scripts/cache-browser.cjs "$env:BUILD_ROOT/dist"
+            if ($LASTEXITCODE -ne 0) { throw 'Browser cache rollover acceptance failed' }
           } finally { Stop-Process -Id $server.Id -ErrorAction SilentlyContinue }
 
       - name: Save static site artifact
@@ -152,7 +158,7 @@ jobs:
           name: website-dist
           path: D:/BuildCache/glory-website/dist
           if-no-files-found: error
-          retention-days: 7
+          retention-days: 30
 
       - name: Deploy to Cloudflare Pages
         env:

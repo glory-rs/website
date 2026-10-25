@@ -8,7 +8,7 @@ param(
 $ErrorActionPreference = 'Stop'
 $projectRoot = Split-Path -Parent $PSScriptRoot
 $savedEnvironment = @{}
-$environmentNames = @('CARGO_HOME','CARGO_TARGET_DIR','CARGO_BUILD_JOBS','CARGO_INCREMENTAL','TEMP','TMP','PYTHONPYCACHEPREFIX','GLORY_WEBSITE_BASE')
+$environmentNames = @('CARGO_HOME','CARGO_TARGET_DIR','CARGO_BUILD_JOBS','CARGO_INCREMENTAL','TEMP','TMP','PYTHONPYCACHEPREFIX','GLORY_WEBSITE_BASE','GLORY_WEBSITE_MEDIA')
 foreach ($name in $environmentNames) { $savedEnvironment[$name] = [Environment]::GetEnvironmentVariable($name, 'Process') }
 function Invoke-WebsiteCargo {
     param([string[]]$Arguments)
@@ -32,6 +32,9 @@ try {
     # Generate into an empty directory so removed routes/assets cannot survive a rebuild.
     if (Test-Path -LiteralPath $dist) { Remove-Item -LiteralPath $dist -Recurse -Force }
     New-Item -ItemType Directory -Force -Path $dist | Out-Null
+    $mediaDirectory = & python scripts/site-assets.py prepare $dist assets
+    if ($LASTEXITCODE -ne 0) { throw 'Media fingerprint failed' }
+    $env:GLORY_WEBSITE_MEDIA = "/$mediaDirectory"
     $metadata = & cargo metadata --locked --no-deps --format-version 1 | ConvertFrom-Json
     if ($LASTEXITCODE -ne 0) { throw 'website metadata failed' }
     if ([IO.Path]::GetFullPath($metadata.target_directory) -ne [IO.Path]::GetFullPath($env:CARGO_TARGET_DIR)) { throw "Unexpected website target: $($metadata.target_directory)" }
@@ -45,12 +48,14 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'website wasm-bindgen failed' }
     Copy-Item -LiteralPath styles/site.css -Destination "$dist/site.css" -Force
     Copy-Item -LiteralPath ../sapid/styles/sapid.css -Destination "$dist/sapid.css" -Force
-    New-Item -ItemType Directory -Force -Path "$dist/assets" | Out-Null
-    Copy-Item -Path assets/* -Destination "$dist/assets" -Force
+    $assetDirectory = & python scripts/site-assets.py bundle $dist
+    if ($LASTEXITCODE -ne 0) { throw 'Asset fingerprint failed' }
     Copy-Item -LiteralPath "$projectRoot/deploy/_headers" -Destination "$dist/_headers" -Force
     $generateArguments = @('run','--locked','--bin','generate')
     if ($Release) { $generateArguments += '--release' }
-    Invoke-WebsiteCargo -Arguments ($generateArguments + @('--',$dist))
+    Invoke-WebsiteCargo -Arguments ($generateArguments + @('--',$dist,$assetDirectory))
+    & python scripts/site-assets.py validate $dist
+    if ($LASTEXITCODE -ne 0) { throw 'Asset validation failed' }
     $oversized = @(Get-ChildItem -LiteralPath $dist -Recurse -File | Where-Object Length -GT (25 * 1024 * 1024))
     if ($oversized.Count) { throw "Cloudflare Pages assets exceed 25 MiB: $($oversized.Name -join ', ')" }
     Write-Output "Website output: $dist"
