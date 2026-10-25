@@ -1,3 +1,4 @@
+use crate::Locale;
 use crate::{Route, components::link, components::*};
 use glory::prelude::*;
 use sapid::Theme;
@@ -101,100 +102,100 @@ const CLEANUP: &str = r#"widget(|scope| {
     text().content(value).show_in(scope)
 })"#;
 
-pub fn custom_widgets() -> impl Widget {
+pub fn custom_widgets(locale: Locale) -> impl Widget {
     let content: Vec<Box<dyn Widget>> = vec![
-        Box::new(copy("docs-kicker", "THE GLORY GUIDE")),
-        Box::new(heading(1, "docs-title", "Writing custom widgets.")),
+        Box::new(copy("docs-kicker", locale.text("architecture-the-glory-guide"))),
+        Box::new(heading(1, "docs-title", locale.text("custom-widgets-writing-custom-widgets"))),
         Box::new(copy(
             "docs-lead",
-            "Implementing Widget gives a reusable Rust value its own construction logic, state ownership, children, and semantic event handlers. The trait is small; understanding build, Scope, and mount lifetime is what makes the component correct.",
+            locale.text("custom-widgets-implementing-widget-gives-a-reusable-rust-value-its-own"),
         )),
-        Box::new(heading(2, "docs-heading", "A complete Counter")),
+        Box::new(heading(2, "docs-heading", locale.text("custom-widgets-a-complete-counter"))),
         Box::new(copy(
             "docs-paragraph",
-            "The following component is host-independent. It contains no DOM types, browser listeners, HTML strings, or native window calls. Mount Counter through Web, SSR, Blitz, or the memory host and the same semantic tree and event behavior are used.",
+            locale.text("custom-widgets-the-following-component-is-host-independent-it-contains-no"),
         )),
-        Box::new(code_panel(Theme::blue_dark(), "counter.rs", COUNTER, "docs-code")),
+        Box::new(code_panel(locale, Theme::blue_dark(), "counter.rs", COUNTER, "docs-code")),
         Box::new(copy(
             "docs-paragraph",
-            "The required method is fn build(&mut self, scope: &Scope) -> Result. Result here is Glory's UI result alias, so node creation, child mounting, and other fallible operations can use ?. The final col().show_in(scope) mounts the root builder into the Counter's scope and returns that Result. Returning the bare col() would be a type error inside a Widget implementation.",
+            locale.text("custom-widgets-the-required-method-is-fn-build-mut-self-scope"),
         )),
-        Box::new(heading(2, "docs-heading", "State belongs to the mounted Scope")),
+        Box::new(heading(2, "docs-heading", locale.text("custom-widgets-state-belongs-to-the-mounted-scope"))),
         Box::new(copy(
             "docs-paragraph",
-            "scope.cage(0_i32) creates mutable state owned by this mount. The returned Cage is a small Copy handle, so it can be captured by the derived label and the button handler. There is no count field on Counter: the state is runtime-owned and lives for exactly as long as the mounted Scope. Every separate Counter mount gets an independent zero.",
+            locale.text("custom-widgets-scope-cage-0-i32-creates-mutable-state-owned-by"),
         )),
         Box::new(copy(
             "docs-paragraph",
-            "count.map derives a reactive String for text().content. That builder method accepts values convertible into Lotus, allowing either a static String or a reactive source. When the event handler calls revise, the derived value and text binding are scheduled; build is not called again. Avoid creating maps or other reactive nodes inside pure derived computations.",
+            locale.text("custom-widgets-count-map-derives-a-reactive-string-for-text-content"),
         )),
         Box::new(view().class("docs-callout").fill((
-            copy("docs-callout-title", "Build is construction, not a render function"),
-            copy("", "Do not expect self fields or a bare Cage read to refresh the interface. Store configuration in self, create owned reactive state in build, and install bindings for every property that must change."),
+            copy("docs-callout-title", locale.text("custom-widgets-build-is-construction-not-a-render-function")),
+            copy("", locale.text("custom-widgets-do-not-expect-self-fields-or-a-bare-cage")),
         ))),
-        Box::new(heading(2, "docs-heading", "Activate is a semantic Event")),
+        Box::new(heading(2, "docs-heading", locale.text("custom-widgets-activate-is-a-semantic-event"))),
         Box::new(copy(
             "docs-paragraph",
-            ".on(activate, handler) subscribes to EventKind::Activate. The callback receives a typed glory::render::Event, re-exported by the prelude. Event::Activate represents a control activation request without making the shared widget depend on a browser MouseEvent or keyboard event. The host handles native input and queues the semantic event; Glory routes it to the registered handler.",
+            locale.text("custom-widgets-on-activate-handler-subscribes-to-eventkind-activate-the-callback"),
         )),
         Box::new(copy(
             "docs-paragraph",
-            "The matches! check in Counter is explicit about the payload, although a handler registered only for activate will normally receive Event::Activate. Other controls use other event kinds and payloads: value_changed carries text and a revision, while checked_changed carries a boolean. Do not simulate input by directly invoking DOM events from shared component logic; drive application state or use semantic events in tests.",
+            locale.text("custom-widgets-the-matches-check-in-counter-is-explicit-about-the"),
         )),
-        Box::new(heading(2, "docs-heading", "fill accepts IntoChildren")),
+        Box::new(heading(2, "docs-heading", locale.text("custom-widgets-fill-accepts-intochildren"))),
         Box::new(copy(
             "docs-paragraph",
-            "View, Group, Button, and Link builders accept children through fill. The IntoChildren implementations cover one Widget, tuples of heterogeneous widgets, Vec<W>, and () for no children. A tuple is the usual choice for a fixed layout. Use Vec<Box<dyn Widget>> when a single heterogeneous vector is more convenient, and use each or list when children represent a reactive collection.",
+            locale.text("custom-widgets-view-group-button-and-link-builders-accept-children-through"),
         )),
         Box::new(copy(
             "docs-paragraph",
-            "A reusable wrapper can accept impl IntoChildren in its constructor and store the resulting glory::ui::Children. Children is a consumed mount input, not a cloneable template. Because build receives &mut self and runs once, replace it with an empty child list and pass the original value to fill. fill then mounts each child beneath the new semantic parent.",
+            locale.text("custom-widgets-a-reusable-wrapper-can-accept-impl-intochildren-in-its"),
         )),
-        Box::new(code_panel(Theme::blue_dark(), "panel.rs", CHILDREN, "docs-code")),
+        Box::new(code_panel(locale, Theme::blue_dark(), "panel.rs", CHILDREN, "docs-code")),
         Box::new(copy(
             "docs-paragraph",
-            "Panel::new((heading, body, Counter)) works because the three-element tuple implements IntoChildren. Calling fill more than once extends the builder's stored child list; it does not replace earlier children. This differs from class and style, which configure one replaceable property slot.",
+            locale.text("custom-widgets-panel-new-heading-body-counter-works-because-the-three"),
         )),
         Box::new(heading(2, "docs-heading", "class and style replace their previous values")),
         Box::new(copy(
             "docs-paragraph",
-            "Calling .class(...) twice replaces the complete whitespace-separated class list on that builder; it does not append. Similarly, .style(...) replaces the complete typed Style value and removes any earlier binding for that property slot. This rule applies whether the new value is static or reactive. CSS cascade rules can still combine styles from external stylesheets, but two builder calls are not a merge API.",
+            locale.text("custom-widgets-calling-class-twice-replaces-the-complete-whitespace-separated-class"),
         )),
         Box::new(copy(
             "docs-paragraph",
-            "Construct one Style with chained field methods when you want to combine fields. Be especially careful with row() and col(): their initial flex display and direction are just a Style value. Supplying a replacement style without those fields removes the convenience defaults. Start from view(), or include display and flex_direction explicitly in the replacement.",
+            locale.text("custom-widgets-construct-one-style-with-chained-field-methods-when-you"),
         )),
-        Box::new(code_panel(Theme::blue_dark(), "overrides.rs", OVERRIDES, "docs-code")),
-        Box::new(heading(2, "docs-heading", "Children and Owner are linked, not identical")),
+        Box::new(code_panel(locale, Theme::blue_dark(), "overrides.rs", OVERRIDES, "docs-code")),
+        Box::new(heading(2, "docs-heading", locale.text("custom-widgets-children-and-owner-are-linked-not-identical"))),
         Box::new(copy(
             "docs-paragraph",
-            "Semantic parentage and reactive ownership are related but distinct. The Panel's View is the semantic parent of its children. Each child passed through fill is mounted in a fresh child Scope, and the constructing scope retains that mount. The child Owner therefore follows the Panel's lifetime even though the child can have its own state, subscriptions, tasks, and descendants.",
-        )),
-        Box::new(copy(
-            "docs-paragraph",
-            "Removing a mounted branch disposes its Owner and descendants, invalidates their generational handles, removes listeners and semantic nodes, and cancels owned queued work. Capturing a child's Cage in a parent callback does not invert that relationship or keep the child alive. Pass application state down deliberately from a longer-lived Scope when it must outlive a branch.",
+            locale.text("custom-widgets-semantic-parentage-and-reactive-ownership-are-related-but-distinct"),
         )),
         Box::new(copy(
             "docs-paragraph",
-            "You normally do not need to call scope.child() yourself: fill, show_in, mount_with, and control-flow controllers establish and retain the required child scopes. If a custom controller creates a child UI Scope directly, it must retain that Scope or its Mounted guard for the entire mounted lifetime. Dropping the guard disposes the subtree.",
+            locale.text("custom-widgets-removing-a-mounted-branch-disposes-its-owner-and-descendants"),
         )),
-        Box::new(code_panel(Theme::blue_dark(), "cleanup.rs", CLEANUP, "docs-code")),
-        Box::new(heading(2, "docs-heading", "Choose a trait, closure, or plain function")),
         Box::new(copy(
             "docs-paragraph",
-            "Implement Widget when the component has a reusable name, configuration, accepted children, or trait-based composition. Counter and Panel are good examples. Use widget(|scope| ...) when a local component needs owned state but does not justify a named struct. The closure must implement FnMut(&Scope) -> Result + 'static and is still built only once per mount.",
+            locale.text("custom-widgets-you-normally-do-not-need-to-call-scope-child"),
         )),
-        Box::new(code_panel(Theme::blue_dark(), "save_button.rs", CLOSURE, "docs-code")),
+        Box::new(code_panel(locale, Theme::blue_dark(), "cleanup.rs", CLEANUP, "docs-code")),
+        Box::new(heading(2, "docs-heading", locale.text("custom-widgets-choose-a-trait-closure-or-plain-function"))),
         Box::new(copy(
             "docs-paragraph",
-            "A plain fn card(...) -> impl Widget is enough for stateless composition or for returning another widget configured with arguments. If that function needs a Scope to allocate local Cages, return widget(...) rather than trying to read state during ordinary function execution. None of these choices changes the update model: dynamic properties require bindings, and structural changes require control flow.",
+            locale.text("custom-widgets-implement-widget-when-the-component-has-a-reusable-name"),
         )),
-        Box::new(link("Review the retained tree and update model  →", Route::Architecture, "text-link")),
+        Box::new(code_panel(locale, Theme::blue_dark(), "save_button.rs", CLOSURE, "docs-code")),
+        Box::new(copy(
+            "docs-paragraph",
+            locale.text("custom-widgets-a-plain-fn-card-impl-widget-is-enough-for"),
+        )),
+        Box::new(link(locale, locale.text("custom-widgets-review-the-retained-tree-and-update-model"), Route::Architecture, "text-link")),
         Box::new(view().class("docs-callout").fill((
-            copy("docs-callout-title", "A mount checklist"),
-            copy("", "Allocate state from the build Scope; finish the root with show_in(scope); consume stored children exactly once; use typed Event handlers; and let fill, show_in, or an explicit Mounted guard retain every child lifetime."),
+            copy("docs-callout-title", locale.text("custom-widgets-a-mount-checklist")),
+            copy("", locale.text("custom-widgets-allocate-state-from-the-build-scope-finish-the-root")),
         ))),
-        Box::new(doc_nav(Some(Route::Widgets), Some(Route::Styling))),
+        Box::new(doc_nav(locale, Some(Route::Widgets), Some(Route::Styling))),
     ];
-    docs_layout(Route::CustomWidgets, view().fill(content))
+    docs_layout(locale, Route::CustomWidgets, view().fill(content))
 }

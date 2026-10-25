@@ -57,7 +57,7 @@ try {
     if ($Serve -or $Browser) {
         $listener = Get-NetTCPConnection -LocalAddress 127.0.0.1 -LocalPort 8796 -State Listen -ErrorAction SilentlyContinue
         if (-not $listener) {
-            $server = Start-Process -FilePath 'python' -ArgumentList @('-m','http.server','8796','--bind','127.0.0.1','--directory',$dist) -WindowStyle Hidden -PassThru -RedirectStandardOutput "$BuildRoot/server.log" -RedirectStandardError "$BuildRoot/server-errors.log"
+            $server = Start-Process -FilePath 'python' -ArgumentList @("$PSScriptRoot/preview.py",'--port','8796','--directory',$dist) -WindowStyle Hidden -PassThru -RedirectStandardOutput "$BuildRoot/server.log" -RedirectStandardError "$BuildRoot/server-errors.log"
             $server.Id | Set-Content -LiteralPath "$BuildRoot/server.pid"
         }
         $ready = $false

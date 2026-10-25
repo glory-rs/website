@@ -1,3 +1,47 @@
+use crate::Locale;
+
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
+pub struct SiteRoute {
+    pub locale: Locale,
+    pub page: Route,
+}
+
+impl SiteRoute {
+    pub const fn new(locale: Locale, page: Route) -> Self {
+        Self { locale, page }
+    }
+    pub fn parse(path: &str) -> Self {
+        let path = path.split(['?', '#']).next().unwrap_or(path);
+        if path == "/zh" || path.starts_with("/zh/") {
+            Self::new(Locale::ZhCn, Route::parse(&path[3..]))
+        } else {
+            Self::new(Locale::En, Route::parse(path))
+        }
+    }
+    pub fn path(self) -> String {
+        match self.locale {
+            Locale::En => self.page.path().to_owned(),
+            Locale::ZhCn => format!("/zh{}", self.page.path()),
+        }
+    }
+    pub fn title(self) -> String {
+        self.page.title(self.locale)
+    }
+    pub fn description(self) -> String {
+        self.page.description(self.locale)
+    }
+    /// Replace only the language/path, retaining the navigation context.
+    pub fn switch_path(self, search: &str, hash: &str) -> String {
+        format!("{}{}{}", Self::new(self.locale.other(), self.page).path(), search, hash)
+    }
+}
+
+impl From<Route> for SiteRoute {
+    fn from(page: Route) -> Self {
+        Self::new(Locale::En, page)
+    }
+}
+
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
 pub enum Route {
     #[default]
@@ -62,53 +106,56 @@ impl Route {
         }
     }
 
-    pub fn title(self) -> &'static str {
+    pub fn title(self, locale: Locale) -> String {
         match self {
-            Self::Home => "Glory — Semantic UI in Rust",
-            Self::Docs => "Get started — Glory",
-            Self::Architecture => "Architecture and design — Glory",
-            Self::Reactivity => "Fine-grained reactivity — Glory",
-            Self::Widgets => "Built-in widgets — Glory",
-            Self::CustomWidgets => "Writing custom widgets — Glory",
-            Self::Styling => "Styling and assets — Glory",
-            Self::Web => "Web applications — Glory",
-            Self::Ssr => "SSR and hydration — Glory",
-            Self::Platforms => "Cross-platform applications — Glory",
-            Self::NotFound => "Page not found — Glory",
+            Self::Home => locale.text("meta-glory-semantic-ui-in-rust"),
+            Self::Docs => locale.text("meta-get-started-glory"),
+            Self::Architecture => locale.text("meta-architecture-and-design-glory"),
+            Self::Reactivity => locale.text("meta-fine-grained-reactivity-glory"),
+            Self::Widgets => locale.text("meta-built-in-widgets-glory"),
+            Self::CustomWidgets => locale.text("meta-writing-custom-widgets-glory"),
+            Self::Styling => locale.text("meta-styling-and-assets-glory"),
+            Self::Web => locale.text("meta-web-applications-glory"),
+            Self::Ssr => locale.text("meta-ssr-and-hydration-glory"),
+            Self::Platforms => locale.text("meta-cross-platform-applications-glory"),
+            Self::NotFound => locale.text("meta-page-not-found-glory"),
         }
     }
 
-    pub fn description(self) -> &'static str {
+    pub fn description(self, locale: Locale) -> String {
         match self {
             Self::Home => {
-                "Learn Glory's semantic UI architecture, fine-grained reactivity, widgets, SSR, and cross-platform rendering in Rust."
+                locale.text("meta-learn-glory-s-semantic-ui-architecture-fine-grained-reactivity")
             }
             Self::Docs => {
-                "Install Glory, build your first semantic widget, and choose a learning path."
+                locale.text("meta-install-glory-build-your-first-semantic-widget-and-choose")
             }
             Self::Architecture => {
-                "Understand Glory's retained semantic tree, typed patches, explicit ownership, and replaceable rendering hosts."
+                locale.text("meta-understand-glory-s-retained-semantic-tree-typed-patches-explicit")
             }
             Self::Reactivity => {
-                "Owned Cage, Bond, and Lotus values provide explicit fine-grained reactivity in Glory."
+                locale.text("meta-owned-cage-bond-and-lotus-values-provide-explicit-fine")
             }
             Self::Widgets => {
-                "Compose interfaces with Glory's built-in semantic elements, control flow, and virtual lists."
+                locale.text("meta-compose-interfaces-with-glory-s-built-in-semantic-elements")
             }
             Self::CustomWidgets => {
-                "Implement the Widget trait, own reactive state, handle semantic events, and compose children in Rust."
+                locale.text("meta-implement-the-widget-trait-own-reactive-state-handle-semantic")
             }
             Self::Styling => {
-                "Use typed styles, external CSS, and bounded stylesheets across Glory rendering hosts."
+                locale.text("meta-use-typed-styles-external-css-and-bounded-stylesheets-across")
             }
-            Self::Web => "Launch and hydrate a Glory application in a WebAssembly browser host.",
-            Self::Ssr => {
-                "Render static HTML, create hydration snapshots, transfer resources, and stream Glory applications."
+            Self::Web => {
+                locale.text("meta-launch-and-hydrate-a-glory-application-in-a-webassembly")
             }
+            Self::Ssr => locale
+                .text("meta-render-static-html-create-hydration-snapshots-transfer-resources-and"),
             Self::Platforms => {
-                "Share Glory widgets across Web, SSR, and Blitz desktop hosts with explicit platform boundaries."
+                locale.text("meta-share-glory-widgets-across-web-ssr-and-blitz-desktop")
             }
-            Self::NotFound => "The requested Glory documentation page could not be found.",
+            Self::NotFound => {
+                locale.text("meta-the-requested-glory-documentation-page-could-not-be-found")
+            }
         }
     }
 }

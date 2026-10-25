@@ -1,3 +1,4 @@
+use crate::Locale;
 use crate::{Route, components::link, components::*};
 use glory::prelude::*;
 use sapid::Theme;
@@ -106,100 +107,127 @@ let app = glory::web::hydrate(root, app())
 // Hydration also returns the WebApp guard that must be retained.
 APP.with(|slot| *slot.borrow_mut() = Some(app));"#;
 
-pub fn web() -> impl Widget {
+pub fn web(locale: Locale) -> impl Widget {
     let content: Vec<Box<dyn Widget>> = vec![
-        Box::new(copy("docs-kicker", "THE GLORY GUIDE")),
-        Box::new(heading(1, "docs-title", "Web applications.")),
+        Box::new(copy("docs-kicker", locale.text("architecture-the-glory-guide"))),
+        Box::new(heading(1, "docs-title", locale.text("web-web-applications"))),
         Box::new(copy(
             "docs-lead",
-            "A Glory browser application is a wasm32 Rust library started by wasm-bindgen. The host entry point finds an empty web_sys::Element, mounts the shared widget tree, retains the WebApp guard, and serves the generated JavaScript and WASM over HTTP.",
+            locale.text("web-a-glory-browser-application-is-a-wasm32-rust-library"),
         )),
-        Box::new(heading(2, "docs-heading", "Select the wasm32 Web feature")),
+        Box::new(heading(2, "docs-heading", locale.text("web-select-the-wasm32-web-feature"))),
         Box::new(copy(
             "docs-paragraph",
-            "Enable Glory's web feature for a DOM application. It selects the HTML mapper and browser host; the shared Counter itself still needs only glory::prelude::*. Add wasm-bindgen for the start export and web-sys with Window, Document, and Element for mount lookup. Keep the wasm-bindgen CLI used after compilation at the same version as the locked Rust crate.",
+            locale.text("web-enable-glory-s-web-feature-for-a-dom-application"),
         )),
-        Box::new(code_panel(Theme::blue_dark(), "Cargo.toml", CARGO, "docs-code")),
+        Box::new(code_panel(locale, Theme::blue_dark(), "Cargo.toml", CARGO, "docs-code")),
         Box::new(copy(
             "docs-paragraph",
-            "The cdylib output is the WASM library loaded by the browser; rlib keeps the code available to native tests and server-side rendering. Build the browser entry with --target wasm32-unknown-unknown. The old web-csr and web-ssr feature names are not part of this API: choose web, ssr, and optionally hydrate.",
+            locale.text("web-the-cdylib-output-is-the-wasm-library-loaded-by"),
         )),
-        Box::new(heading(2, "docs-heading", "Find the root and call launch")),
+        Box::new(heading(2, "docs-heading", locale.text("web-find-the-root-and-call-launch"))),
         Box::new(copy(
             "docs-paragraph",
-            "launch(root, widget) mounts an already constructed Widget into a web_sys::Element. The complete entry point below uses the Counter from the custom-widget guide. Convert Glory's error into JsValue so module startup reports a useful failure instead of silently leaving an empty page.",
+            locale.text("web-launch-root-widget-mounts-an-already-constructed-widget-into"),
         )),
-        Box::new(code_panel(Theme::blue_dark(), "src/web.rs", START, "docs-code")),
+        Box::new(code_panel(locale, Theme::blue_dark(), "src/web.rs", START, "docs-code")),
         Box::new(view().class("docs-callout").fill((
-            copy("docs-callout-title", "WebApp is a lifetime guard"),
-            copy("", "Do not let the returned WebApp fall out of scope at the end of start. Dropping it releases the DOM, observers, native listeners, animation frame, and owned async tasks. Store it in application state or a thread_local guard for as long as the interface should run."),
+            copy("docs-callout-title", locale.text("web-webapp-is-a-lifetime-guard")),
+            copy("", locale.text("web-do-not-let-the-returned-webapp-fall-out-of")),
         ))),
-        Box::new(heading(2, "docs-heading", "Use launch_with for root-scope construction")),
+        Box::new(heading(
+            2,
+            "docs-heading",
+            locale.text("web-use-launch-with-for-root-scope-construction"),
+        )),
         Box::new(copy(
             "docs-paragraph",
-            "launch_with(root, factory) accepts FnOnce(&Scope) -> W. It is useful when constructing the root widget also needs to allocate Cages or other state in the root scope. The factory returns the widget; it does not call show_in itself. launch(root, widget) is the convenient equivalent when the widget value is already available.",
+            locale.text("web-launch-with-root-factory-accepts-fnonce-scope-w-it"),
         )),
-        Box::new(code_panel(Theme::blue_dark(), "launch_with.rs", LAUNCH_WITH, "docs-code")),
+        Box::new(code_panel(
+            locale,
+            Theme::blue_dark(),
+            "launch_with.rs",
+            LAUNCH_WITH,
+            "docs-code",
+        )),
         Box::new(copy(
             "docs-paragraph",
-            "Both functions return Result<WebApp>. The factory form is not a recurring render callback: it runs once during mount, exactly like Widget::build. Reactive values installed there update the retained tree through bindings after startup.",
+            locale.text("web-both-functions-return-result-webapp-the-factory-form-is"),
         )),
-        Box::new(heading(2, "docs-heading", "The CSR mount must be empty")),
+        Box::new(heading(2, "docs-heading", locale.text("web-the-csr-mount-must-be-empty"))),
         Box::new(copy(
             "docs-paragraph",
-            "launch and launch_with require an empty, unclaimed root. They reject an element with any child nodes or an existing data-gly-app attribute. Child text nodes count too, so keep whitespace, comments, fallback content, and server markup out of a CSR mount. This guard prevents client rendering from silently deleting content that should instead be hydrated.",
+            locale.text("web-launch-and-launch-with-require-an-empty-unclaimed-root"),
         )),
-        Box::new(code_panel(Theme::blue_dark(), "index.html", HTML, "docs-code")),
+        Box::new(code_panel(locale, Theme::blue_dark(), "index.html", HTML, "docs-code")),
         Box::new(copy(
             "docs-paragraph",
-            "The module imports the JavaScript generated by wasm-bindgen and awaits initialization. The #[wasm_bindgen(start)] function then runs, finds #app, and mounts Glory. You do not need to create DOM elements in Rust startup beyond looking up this root; the semantic Web renderer creates and updates the application's DOM.",
+            locale.text("web-the-module-imports-the-javascript-generated-by-wasm-bindgen"),
         )),
-        Box::new(heading(2, "docs-heading", "Build bindings and serve over HTTP")),
+        Box::new(heading(2, "docs-heading", locale.text("web-build-bindings-and-serve-over-http"))),
         Box::new(copy(
             "docs-paragraph",
-            "Compile the library to WASM, run wasm-bindgen with --target web, and place index.html beside the generated .js and _bg.wasm files. Then start an HTTP server for that output directory and open the shown localhost URL in a browser.",
+            locale.text("web-compile-the-library-to-wasm-run-wasm-bindgen-with"),
         )),
-        Box::new(code_panel(Theme::blue_dark(), "terminal", BUILD, "docs-code")),
+        Box::new(code_panel(locale, Theme::blue_dark(), "terminal", BUILD, "docs-code")),
         Box::new(view().class("docs-callout").fill((
-            copy("docs-callout-title", "Do not open index.html with file://"),
-            copy("", "ES module and WASM loading require a proper HTTP origin and MIME handling; browser file:// security rules commonly block those requests. Serve the generated directory over HTTP even for local development. A successful native cargo build alone does not exercise this browser startup path."),
+            copy("docs-callout-title", locale.text("web-do-not-open-index-html-with-file")),
+            copy("", locale.text("web-es-module-and-wasm-loading-require-a-proper-http")),
         ))),
-        Box::new(heading(2, "docs-heading", "Link SSR to the browser with hydrate")),
-        Box::new(copy(
-            "docs-paragraph",
-            "Client-only launch creates a fresh DOM. Hydration is a separate, explicit operation that adopts a versioned SSR Snapshot without replaying initial property setters or replacing the existing subtree. Enable ssr in the native server build and hydrate in the wasm32 browser build; hydrate implies web. If one dependency declaration serves both targets, features = [\"web\", \"ssr\", \"hydrate\"] selects the complete setup.",
+        Box::new(heading(
+            2,
+            "docs-heading",
+            locale.text("web-link-ssr-to-the-browser-with-hydrate"),
         )),
         Box::new(copy(
             "docs-paragraph",
-            "Put the shared widget factory in code compiled for both targets. The server and browser construct equivalent initial semantic trees from the same application logic. Arbitrary Rust heap state is not magically transferred by hydration; initial values must agree, and asynchronous request data needs an explicit resource or application data strategy.",
+            locale.text("web-client-only-launch-creates-a-fresh-dom-hydration-is"),
         )),
-        Box::new(code_panel(Theme::blue_dark(), "src/app.rs", SHARED_APP, "docs-code")),
-        Box::new(heading(2, "docs-heading", "Serialize a Snapshot, not plain markup")),
         Box::new(copy(
             "docs-paragraph",
-            "glory::ssr::snapshot(app()) returns a Snapshot whose html includes the version markers required by hydrate. Insert that fragment verbatim inside the exclusively owned #app element. Also include glory::html::BASE_CSS with the data-gly-base=\"v1\" attribute; the browser host can then recognize the base style rather than duplicate it.",
+            locale.text("web-put-the-shared-widget-factory-in-code-compiled-for"),
         )),
-        Box::new(code_panel(Theme::blue_dark(), "src/server.rs", SSR, "docs-code")),
+        Box::new(code_panel(locale, Theme::blue_dark(), "src/app.rs", SHARED_APP, "docs-code")),
+        Box::new(heading(
+            2,
+            "docs-heading",
+            locale.text("web-serialize-a-snapshot-not-plain-markup"),
+        )),
         Box::new(copy(
             "docs-paragraph",
-            "glory::ssr::render is appropriate when you only need HTML output, but its unversioned string is not the hydration contract. The Snapshot structure, widget factory, and browser feature set must agree. Hydration validates the complete initial subtree before attaching runtime metadata; on a version or structure mismatch it reports an error instead of repairing arbitrary DOM in place.",
+            locale.text("web-glory-ssr-snapshot-app-returns-a-snapshot-whose-html"),
         )),
-        Box::new(heading(2, "docs-heading", "Adopt the DOM and retain the same guard")),
+        Box::new(code_panel(locale, Theme::blue_dark(), "src/server.rs", SSR, "docs-code")),
         Box::new(copy(
             "docs-paragraph",
-            "Use hydrate(root, widget) or hydrate_with(root, factory) only for an SSR root. Do not call launch on that root first: launch requires emptiness, while hydrate expects the versioned server fragment. The browser still constructs the widget to establish state and bindings, but adopts matching DOM instead of recreating it. Existing eligible user input is preserved through the adoption rules.",
+            locale.text("web-glory-ssr-render-is-appropriate-when-you-only-need"),
         )),
-        Box::new(code_panel(Theme::blue_dark(), "src/web.rs", HYDRATE, "docs-code")),
+        Box::new(heading(
+            2,
+            "docs-heading",
+            locale.text("web-adopt-the-dom-and-retain-the-same-guard"),
+        )),
         Box::new(copy(
             "docs-paragraph",
-            "The hydrate_with factory has the same FnOnce(&Scope) -> W shape as launch_with and is useful when the shared factory returns both a widget and handles needed by browser application state. Whichever entry point you use, retain the returned WebApp. Hydration changes how the initial DOM is acquired, not who owns the running app afterward.",
+            locale.text("web-use-hydrate-root-widget-or-hydrate-with-root-factory"),
         )),
-        Box::new(link("Review getting started and host features  →", Route::Docs, "text-link")),
+        Box::new(code_panel(locale, Theme::blue_dark(), "src/web.rs", HYDRATE, "docs-code")),
+        Box::new(copy(
+            "docs-paragraph",
+            locale.text("web-the-hydrate-with-factory-has-the-same-fnonce-scope"),
+        )),
+        Box::new(link(
+            locale,
+            locale.text("web-review-getting-started-and-host-features"),
+            Route::Docs,
+            "text-link",
+        )),
         Box::new(view().class("docs-callout").fill((
-            copy("docs-callout-title", "The complete startup contract"),
-            copy("", "Build for wasm32 with web; look up a web_sys root; use launch or launch_with only on an empty CSR mount; serve modules and WASM over HTTP; retain WebApp; and choose hydrate or hydrate_with with the matching SSR Snapshot when adopting server DOM."),
+            copy("docs-callout-title", locale.text("web-the-complete-startup-contract")),
+            copy("", locale.text("web-build-for-wasm32-with-web-look-up-a-web")),
         ))),
-        Box::new(doc_nav(Some(Route::Styling), Some(Route::Ssr))),
+        Box::new(doc_nav(locale, Some(Route::Styling), Some(Route::Ssr))),
     ];
-    docs_layout(Route::Web, view().fill(content))
+    docs_layout(locale, Route::Web, view().fill(content))
 }

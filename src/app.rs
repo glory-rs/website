@@ -1,9 +1,9 @@
-use crate::{Route, components, pages};
+use crate::{Route, SiteRoute, components, pages};
 use glory::prelude::*;
 
 #[derive(Clone, Copy)]
 pub struct AppState {
-    pub route: Cage<Route>,
+    pub route: Cage<SiteRoute>,
 }
 
 pub fn request_navigation(request: sapid::AnchorRequest) {
@@ -22,33 +22,35 @@ fn register(state: AppState) {
     let _ = state;
 }
 
-fn page(route: Route) -> Box<dyn Widget> {
-    let content: Box<dyn Widget> = match route {
-        Route::Home => Box::new(pages::home()),
-        Route::Docs => Box::new(pages::docs()),
-        Route::Architecture => Box::new(pages::architecture()),
-        Route::Reactivity => Box::new(pages::reactivity()),
-        Route::Widgets => Box::new(pages::widgets()),
-        Route::CustomWidgets => Box::new(pages::custom_widgets()),
-        Route::Styling => Box::new(pages::styling()),
-        Route::Web => Box::new(pages::web()),
-        Route::Ssr => Box::new(pages::ssr()),
-        Route::Platforms => Box::new(pages::platforms()),
-        Route::NotFound => Box::new(pages::not_found()),
+fn page(route: SiteRoute) -> Box<dyn Widget> {
+    let locale = route.locale;
+    let content: Box<dyn Widget> = match route.page {
+        Route::Home => Box::new(pages::home(locale)),
+        Route::Docs => Box::new(pages::docs(locale)),
+        Route::Architecture => Box::new(pages::architecture(locale)),
+        Route::Reactivity => Box::new(pages::reactivity(locale)),
+        Route::Widgets => Box::new(pages::widgets(locale)),
+        Route::CustomWidgets => Box::new(pages::custom_widgets(locale)),
+        Route::Styling => Box::new(pages::styling(locale)),
+        Route::Web => Box::new(pages::web(locale)),
+        Route::Ssr => Box::new(pages::ssr(locale)),
+        Route::Platforms => Box::new(pages::platforms(locale)),
+        Route::NotFound => Box::new(pages::not_found(locale)),
     };
     let theme = sapid::Theme::blue_dark();
     Box::new(view().class(format!("glory-site {}", theme.class())).fill((
-        components::header(route),
+        components::header(locale, route.page),
         content,
-        components::footer(),
+        components::footer(locale),
     )))
 }
 
-pub fn app(route: Route) -> impl Widget {
+pub fn app(route: impl Into<SiteRoute>) -> impl Widget {
+    let route = route.into();
     widget(move |scope| {
         let state = AppState { route: scope.cage(route) };
         register(state);
         let routes = scope.bond(move || vec![state.route.get()]);
-        each(routes, |route| route.path(), move |route, _| page(route.get())).show_in(scope)
+        each(routes, |route| *route, move |route, _| page(route.get())).show_in(scope)
     })
 }

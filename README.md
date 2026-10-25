@@ -20,6 +20,25 @@ The content focuses on Glory itself: its design principles, built-in semantic wi
 
 The current checkout uses sibling path dependencies on `../glory` and `../sapid`.
 
+## Languages
+
+English uses the paths above. Simplified Chinese uses `/zh/` and the same chapter
+paths, for example <https://glory.taidge.com/zh/docs/>. Both versions are generated
+as complete static HTML and hydrate from the URL's language. The header language
+link preserves the chapter, query string and fragment. Browser preferences never
+override an explicit URL.
+
+The optional `glory-i18n` crate supplies Fluent catalogs and Owner-owned reactive
+messages. Text lives in `locales/en.ftl` and `locales/zh-CN.ftl`; page structure
+and code examples are shared Rust. Add matching message IDs and variable names
+in both resources. Native tests reject incomplete resources and resolve every
+message, including the live counter's parameterized label.
+
+Static generation emits 20 localized content pages, English and Chinese 404
+documents, language alternates, canonical URLs, `sitemap.xml` and `robots.txt`.
+Client navigation updates the same document metadata. Cloudflare Pages selects
+the nearest ancestor 404; keep both `/404.html` and `/zh/404.html` in the artifact.
+
 ## Automatic deployment
 
 Pushes to `main` build and publish the production site at
@@ -42,7 +61,7 @@ See [deployment setup and troubleshooting](deploy/README.md).
 ./scripts/build.ps1 -Serve
 ```
 
-Open <http://127.0.0.1:8796/>. Generated files are written to `D:/BuildCache/glory-website/dist`; deploy that directory to a static HTTP host. All asset URLs are root-relative. Configure the host to serve `404.html` for unknown paths.
+Open <http://127.0.0.1:8796/>. Generated files are written to `D:/BuildCache/glory-website/dist`; deploy that directory to a static HTTP host. All asset URLs are root-relative. The preview script serves localized 404 pages, matching Cloudflare Pages.
 
 To build without starting the preview:
 

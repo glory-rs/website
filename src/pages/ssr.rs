@@ -1,3 +1,4 @@
+use crate::Locale;
 use crate::{Route, components::*};
 use glory::prelude::*;
 use sapid::Theme;
@@ -169,128 +170,188 @@ fn adopt_stream(
 let (app, resources) = adopt_stream(root, stream_data)?;
 // Retain `app` just as you would after ordinary hydration."#;
 
-pub fn ssr() -> impl Widget {
+pub fn ssr(locale: Locale) -> impl Widget {
     let content: Vec<Box<dyn Widget>> = vec![
-        Box::new(copy("docs-kicker", "SERVER RENDERING & ADOPTION")),
-        Box::new(heading(1, "docs-title", "SSR and hydration.")),
+        Box::new(copy("docs-kicker", locale.text("ssr-server-rendering-adoption"))),
+        Box::new(heading(1, "docs-title", locale.text("ssr-ssr-and-hydration"))),
         Box::new(copy(
             "docs-lead",
-            "Render useful HTML on the server, then let the browser adopt that exact semantic tree. Glory keeps static output, snapshots, resource transfer, and progressive streaming as explicit choices.",
+            locale.text("ssr-render-useful-html-on-the-server-then-let-the"),
         )),
-        Box::new(heading(2, "docs-heading", "Start with ordinary HTML")),
+        Box::new(heading(2, "docs-heading", locale.text("ssr-start-with-ordinary-html"))),
         Box::new(copy(
             "docs-paragraph",
-            "Use ssr::render for a fragment and ssr::render_document for a complete document with metadata, stylesheets, and BASE_CSS. These APIs produce ordinary server-rendered HTML, not a versioned hydration Snapshot. There is no hydration envelope for web::hydrate to adopt.",
+            locale.text("ssr-use-ssr-render-for-a-fragment-and-ssr-render"),
         )),
-        Box::new(code_panel(Theme::blue_dark(), "static_html.rs", PLAIN_HTML, "docs-code")),
+        Box::new(code_panel(locale, Theme::blue_dark(), "static_html.rs", PLAIN_HTML, "docs-code")),
         Box::new(view().class("docs-callout").fill((
-            copy("docs-callout-title", "Plain HTML is not hydratable"),
-            copy("", "Choose render or render_document for static pages. Do not place their output in a mount and call hydrate: adoption requires snapshot or snapshot_with (or a completed stream)."),
+            copy("docs-callout-title", locale.text("ssr-plain-html-is-not-hydratable")),
+            copy("", locale.text("ssr-choose-render-or-render-document-for-static-pages-do")),
         ))),
-        Box::new(heading(2, "docs-heading", "Create an adoptable snapshot")),
+        Box::new(heading(2, "docs-heading", locale.text("ssr-create-an-adoptable-snapshot"))),
         Box::new(copy(
             "docs-paragraph",
-            "snapshot and snapshot_with wrap the mapper output in Glory's versioned fragment boundaries. Insert Snapshot::html verbatim into an otherwise empty, exclusively owned mount element. Include glory::html::BASE_CSS in the document; unlike render_document, manual snapshot assembly does not add it for you.",
+            locale.text("ssr-snapshot-and-snapshot-with-wrap-the-mapper-output-in"),
         )),
-        Box::new(code_panel(Theme::blue_dark(), "shared.rs", SHARED_COUNTER, "docs-code")),
-        Box::new(code_panel(Theme::blue_dark(), "server.rs", SNAPSHOT_SERVER, "docs-code")),
-        Box::new(heading(2, "docs-heading", "Hydrate the same application")),
+        Box::new(code_panel(locale, Theme::blue_dark(), "shared.rs", SHARED_COUNTER, "docs-code")),
+        Box::new(code_panel(locale, Theme::blue_dark(), "server.rs", SNAPSHOT_SERVER, "docs-code")),
+        Box::new(heading(2, "docs-heading", locale.text("ssr-hydrate-the-same-application"))),
         Box::new(copy(
             "docs-paragraph",
-            "In the wasm32 browser host, call web::hydrate with a widget or web::hydrate_with with a factory. The factory, structure, and initial data must match the server. Hydration validates the entire subtree before attaching runtime state; a version or structure mismatch returns HydrationError and preserves the existing DOM.",
+            locale.text("ssr-in-the-wasm32-browser-host-call-web-hydrate-with"),
         )),
-        Box::new(code_panel(Theme::blue_dark(), "browser.rs", HYDRATE_BROWSER, "docs-code")),
+        Box::new(code_panel(
+            locale,
+            Theme::blue_dark(),
+            "browser.rs",
+            HYDRATE_BROWSER,
+            "docs-code",
+        )),
         Box::new(view().class("docs-callout").fill((
-            copy("docs-callout-title", "Synchronous SSR does not await"),
-            copy("", "render, snapshot, and their _with forms construct and serialize the current tree immediately. They do not block on async Resource loaders or wait for pending values. Seed known terminal data explicitly, render a pending state, or use stream_with when the server should progressively await work."),
+            copy("docs-callout-title", locale.text("ssr-synchronous-ssr-does-not-await")),
+            copy(
+                "",
+                locale.text("ssr-render-snapshot-and-their-with-forms-construct-and-serialize"),
+            ),
         ))),
-        Box::new(heading(2, "docs-heading", "Transfer resources explicitly")),
+        Box::new(heading(2, "docs-heading", locale.text("ssr-transfer-resources-explicitly"))),
         Box::new(copy(
             "docs-paragraph",
-            "The optional resources feature transfers only live, named terminal values. Give every binding a stable name and schema string, and make its business key explicit. For synchronous SSR, prefetch into a resource Snapshot with seed, restore a fresh Resources context, render with snapshot_resources_with, and export before App cleanup removes registrations.",
+            locale.text("ssr-the-optional-resources-feature-transfers-only-live-named-terminal"),
         )),
-        Box::new(code_panel(Theme::blue_dark(), "profile.rs", RESOURCE_FACTORY, "docs-code")),
-        Box::new(code_panel(Theme::blue_dark(), "resource_server.rs", RESOURCE_SERVER, "docs-code")),
+        Box::new(code_panel(
+            locale,
+            Theme::blue_dark(),
+            "profile.rs",
+            RESOURCE_FACTORY,
+            "docs-code",
+        )),
+        Box::new(code_panel(
+            locale,
+            Theme::blue_dark(),
+            "resource_server.rs",
+            RESOURCE_SERVER,
+            "docs-code",
+        )),
         Box::new(copy(
             "docs-paragraph",
-            "resource_script creates an escaped, inert application/json block, not executable bootstrap code. Put it outside the hydrated mount. In the browser, hydrate_resources_with reads it with explicit Limits, restores Resources, and runs the same named bindings. A matching success or error seed skips only the initial request.",
+            locale.text("ssr-resource-script-creates-an-escaped-inert-application-json-block"),
         )),
-        Box::new(code_panel(Theme::blue_dark(), "resource_browser.rs", RESOURCE_BROWSER, "docs-code")),
+        Box::new(code_panel(
+            locale,
+            Theme::blue_dark(),
+            "resource_browser.rs",
+            RESOURCE_BROWSER,
+            "docs-code",
+        )),
         Box::new(view().class("docs-callout").fill((
-            copy("docs-callout-title", "One context per request"),
-            copy("", "Never share a Resources context between requests or applications; clones share that context. Create a new one every time. On a failed low-level adoption attempt, restore a fresh context from the original payload for retry. hydrate_resources_with preserves the data block on failure and removes it only after success."),
+            copy("docs-callout-title", locale.text("ssr-one-context-per-request")),
+            copy(
+                "",
+                locale.text("ssr-never-share-a-resources-context-between-requests-or-applications"),
+            ),
         ))),
-        Box::new(heading(2, "docs-heading", "Stream Shell, Patch, and End")),
+        Box::new(heading(2, "docs-heading", locale.text("ssr-stream-shell-patch-and-end"))),
         Box::new(copy(
             "docs-paragraph",
-            "With the native stream feature, ssr::stream_with returns a local, pull-driven request body. Shell is available before loader polling, Patch frames carry semantic HTML edits as work completes, and End carries terminal resources plus canonical key relabeling. Serve web::STREAM_SCRIPT under your CSP and emit Bootstrap::head_script before the Shell so early input is captured.",
+            locale.text("ssr-with-the-native-stream-feature-ssr-stream-with-returns"),
         )),
-        Box::new(code_panel(Theme::blue_dark(), "stream_server.rs", STREAM_SERVER, "docs-code")),
+        Box::new(code_panel(
+            locale,
+            Theme::blue_dark(),
+            "stream_server.rs",
+            STREAM_SERVER,
+            "docs-code",
+        )),
         Box::new(copy(
             "docs-paragraph",
-            "Backpressure is the polling contract: request the next frame only after the previous chunk has been written. Pausing demand pauses rendering and loader polling; dropping the body cancels its App and futures. Do not replace this with an eager producer that buffers the whole response.",
+            locale.text("ssr-backpressure-is-the-polling-contract-request-the-next-frame"),
         )),
-        Box::new(code_panel(Theme::blue_dark(), "stream_browser.rs", STREAM_BROWSER, "docs-code")),
+        Box::new(code_panel(
+            locale,
+            Theme::blue_dark(),
+            "stream_browser.rs",
+            STREAM_BROWSER,
+            "docs-code",
+        )),
         Box::new(view().class("docs-callout").fill((
-            copy("docs-callout-title", "Wait for the final state"),
-            copy("", "A streaming Shell uses temporary stream markers and is deliberately not adoptable. Never hydrate the Shell or a mid-stream Patch. After End has been applied, the root dispatches glory:stream-ready; only then hydrate the finalized tree with the same factory and transferred resources."),
+            copy("docs-callout-title", locale.text("ssr-wait-for-the-final-state")),
+            copy("", locale.text("ssr-a-streaming-shell-uses-temporary-stream-markers-and-is")),
         ))),
-        Box::new(heading(2, "docs-heading", "Choose the rendering path")),
+        Box::new(heading(2, "docs-heading", locale.text("ssr-choose-the-rendering-path"))),
         Box::new(view().class("docs-choice-table").fill((
             view().class("docs-choice-row docs-choice-header").fill((
-                copy("", "Need"),
-                copy("", "Server API"),
-                copy("", "Browser outcome"),
+                copy("", locale.text("ssr-need")),
+                copy("", locale.text("ssr-server-api")),
+                copy("", locale.text("ssr-browser-outcome")),
             )),
             view().class("docs-choice-row").fill((
-                copy("docs-choice-label", "Static content"),
-                copy("", "render / render_document"),
-                copy("", "Plain HTML; no adoption"),
+                copy("docs-choice-label", locale.text("ssr-static-content")),
+                copy("", locale.text("ssr-render-render-document")),
+                copy("", locale.text("ssr-plain-html-no-adoption")),
             )),
             view().class("docs-choice-row").fill((
-                copy("docs-choice-label", "Interactive initial tree"),
-                copy("", "snapshot / snapshot_with"),
-                copy("", "hydrate / hydrate_with"),
+                copy("docs-choice-label", locale.text("ssr-interactive-initial-tree")),
+                copy("", locale.text("ssr-snapshot-snapshot-with")),
+                copy("", locale.text("ssr-hydrate-hydrate-with")),
             )),
             view().class("docs-choice-row").fill((
-                copy("docs-choice-label", "Prefetched named data"),
-                copy("", "snapshot_resources_with + resource_script"),
+                copy("docs-choice-label", locale.text("ssr-prefetched-named-data")),
+                copy("", locale.text("ssr-snapshot-resources-with-resource-script")),
                 copy("", "hydrate_resources_with"),
             )),
             view().class("docs-choice-row").fill((
-                copy("docs-choice-label", "Progressive async work"),
-                copy("", "stream_with + Bootstrap"),
-                copy("", "Hydrate only after End / glory:stream-ready"),
+                copy("docs-choice-label", locale.text("ssr-progressive-async-work")),
+                copy("", locale.text("ssr-stream-with-bootstrap")),
+                copy("", locale.text("ssr-hydrate-only-after-end-glory-stream-ready")),
             )),
         ))),
-        Box::new(heading(2, "docs-heading", "Common pitfalls")),
+        Box::new(heading(2, "docs-heading", locale.text("ssr-common-pitfalls"))),
         Box::new(view().class("docs-pitfalls").fill((
             view().class("docs-pitfall").fill((
-                heading(3, "docs-card-title", "Rebuilding instead of adopting"),
-                copy("docs-paragraph", "launch requires an empty mount and creates a new tree. Use hydrate for a Snapshot; do not clear or rewrite server markup first."),
+                heading(3, "docs-card-title", locale.text("ssr-rebuilding-instead-of-adopting")),
+                copy(
+                    "docs-paragraph",
+                    locale.text("ssr-launch-requires-an-empty-mount-and-creates-a-new"),
+                ),
             )),
             view().class("docs-pitfall").fill((
-                heading(3, "docs-card-title", "Changing initial inputs"),
-                copy("docs-paragraph", "A different factory, initial Cage value, resource name, schema, or final resource state can produce a mismatch or an extra load. Share the component and seed contract."),
+                heading(3, "docs-card-title", locale.text("ssr-changing-initial-inputs")),
+                copy(
+                    "docs-paragraph",
+                    locale.text("ssr-a-different-factory-initial-cage-value-resource-name-schema"),
+                ),
             )),
             view().class("docs-pitfall").fill((
-                heading(3, "docs-card-title", "Dropping WebApp"),
-                copy("docs-paragraph", "The returned WebApp is a lifetime guard, not a throwaway result. Store it for as long as the interface should remain mounted and interactive."),
+                heading(3, "docs-card-title", locale.text("ssr-dropping-webapp")),
+                copy(
+                    "docs-paragraph",
+                    locale.text("ssr-the-returned-webapp-is-a-lifetime-guard-not-a"),
+                ),
             )),
             view().class("docs-pitfall").fill((
-                heading(3, "docs-card-title", "Expecting implicit async SSR"),
-                copy("docs-paragraph", "A synchronous snapshot never waits for a future. Use explicit seeds for already known values, or the pull-driven stream for progressive completion."),
+                heading(3, "docs-card-title", locale.text("ssr-expecting-implicit-async-ssr")),
+                copy(
+                    "docs-paragraph",
+                    locale.text("ssr-a-synchronous-snapshot-never-waits-for-a-future-use"),
+                ),
             )),
             view().class("docs-pitfall").fill((
-                heading(3, "docs-card-title", "Nesting the data block"),
-                copy("docs-paragraph", "Keep resource_script output outside the mount. Hydration owns the mount's complete subtree; the separate JSON block has its own identity and lifetime."),
+                heading(3, "docs-card-title", locale.text("ssr-nesting-the-data-block")),
+                copy(
+                    "docs-paragraph",
+                    locale.text("ssr-keep-resource-script-output-outside-the-mount-hydration-owns"),
+                ),
             )),
         ))),
         Box::new(view().class("docs-callout").fill((
-            copy("docs-callout-title", "Bring your own production HTTP server"),
-            copy("", "Glory supplies rendering, frames, and browser bootstrap assets—not a production HTTP server. Routing, TLS, concurrency, socket writes, CSP, disconnect handling, and deployment belong to your host. The semantic-web ssr_fixture and stream_fixture binaries are acceptance fixtures, not Axum or Salvo integrations and not production server implementations."),
+            copy("docs-callout-title", locale.text("ssr-bring-your-own-production-http-server")),
+            copy(
+                "",
+                locale.text("ssr-glory-supplies-rendering-frames-and-browser-bootstrap-assets-not"),
+            ),
         ))),
-        Box::new(doc_nav(Some(Route::Web), Some(Route::Platforms))),
+        Box::new(doc_nav(locale, Some(Route::Web), Some(Route::Platforms))),
     ];
-    docs_layout(Route::Ssr, view().fill(content))
+    docs_layout(locale, Route::Ssr, view().fill(content))
 }

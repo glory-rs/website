@@ -1,3 +1,4 @@
+use crate::Locale;
 use crate::{Route, components::*};
 use glory::prelude::*;
 use sapid::Theme;
@@ -146,53 +147,114 @@ fn results(loading: Cage<bool>, ids: Cage<Vec<u64>>) -> impl Widget {
     ))
 }"#;
 
-pub fn widgets() -> impl Widget {
+pub fn widgets(locale: Locale) -> impl Widget {
     let content: Vec<Box<dyn Widget>> = vec![
-        Box::new(copy("docs-kicker", "THE SEMANTIC TOOLBOX")),
-        Box::new(heading(1, "docs-title", "Compose with built-in widgets.")),
+        Box::new(copy("docs-kicker", locale.text("widgets-the-semantic-toolbox"))),
+        Box::new(heading(1, "docs-title", locale.text("widgets-compose-with-built-in-widgets"))),
         Box::new(copy(
             "docs-lead",
-            "Glory's built-ins are finite semantic building blocks. Write ordinary Rust builders, connect owned state, and let the selected host supply layout, input, and presentation.",
+            locale.text("widgets-glory-s-built-ins-are-finite-semantic-building-blocks"),
         )),
         Box::new(view().class("docs-callout").fill((
-            copy("docs-callout-title", "Know what is built in"),
-            copy("", "Glory provides view/group/text/button/input/check/image/link/file/select/graphic/rich_editor, plus row/col/when/each/list. Cards and tabs are Sapid widgets, not Glory built-ins. There is no textarea builder: use input().multiline(true)."),
+            copy("docs-callout-title", locale.text("widgets-know-what-is-built-in")),
+            copy(
+                "",
+                locale.text("widgets-glory-provides-view-group-text-button-input-check-image"),
+            ),
         ))),
-        Box::new(heading(2, "docs-heading", "Import the builders")),
+        Box::new(heading(2, "docs-heading", locale.text("widgets-import-the-builders"))),
         Box::new(copy(
             "docs-paragraph",
-            "The prelude includes the common builders, control flow, reactive values, events, and typed styles. Import file, select, graphic, and rich_editor explicitly from glory::ui; their configuration types live under glory::render.",
+            locale.text("widgets-the-prelude-includes-the-common-builders-control-flow-reactive"),
         )),
-        Box::new(code_panel(Theme::blue_dark(), "imports.rs", IMPORTS, "docs-code")),
-        Box::new(heading(2, "docs-heading", "Structure, content, and controls")),
+        Box::new(code_panel(locale, Theme::blue_dark(), "imports.rs", IMPORTS, "docs-code")),
+        Box::new(heading(2, "docs-heading", locale.text("widgets-structure-content-and-controls"))),
         Box::new(view().class("docs-host-grid").fill((
-            view().class("docs-host-card").fill((heading(3, "docs-card-title", "Structure"), copy("", "view creates a styled semantic container. group joins logical children without adding a layout box. row and col are flex-configured views."))),
-            view().class("docs-host-card").fill((heading(3, "docs-card-title", "Content"), copy("", "text carries inline or structured text, image loads an image with explicit alternative text, link targets a location, and graphic draws bounded vector paths."))),
-            view().class("docs-host-card").fill((heading(3, "docs-card-title", "Input"), copy("", "button, input, check, file, select, and rich_editor expose semantic properties and typed events rather than DOM elements."))),
+            view().class("docs-host-card").fill((
+                heading(3, "docs-card-title", locale.text("widgets-structure")),
+                copy(
+                    "",
+                    locale.text(
+                        "widgets-view-creates-a-styled-semantic-container-group-joins-logical",
+                    ),
+                ),
+            )),
+            view().class("docs-host-card").fill((
+                heading(3, "docs-card-title", locale.text("widgets-content")),
+                copy(
+                    "",
+                    locale.text("widgets-text-carries-inline-or-structured-text-image-loads-an"),
+                ),
+            )),
+            view().class("docs-host-card").fill((
+                heading(3, "docs-card-title", locale.text("widgets-input")),
+                copy(
+                    "",
+                    locale.text("widgets-button-input-check-file-select-and-rich-editor-expose"),
+                ),
+            )),
         ))),
-        Box::new(code_panel(Theme::blue_dark(), "profile.rs", CORE_CONTROLS, "docs-code")),
+        Box::new(code_panel(locale, Theme::blue_dark(), "profile.rs", CORE_CONTROLS, "docs-code")),
         Box::new(copy(
             "docs-paragraph",
-            "Every image needs alt(...) or decorative(). Use view for structural roles and physical queries; group is boxless. Link uses target(...), and controls accept static values or Lotus-compatible reactive handles.",
+            locale.text("widgets-every-image-needs-alt-or-decorative-use-view-for"),
         )),
-        Box::new(heading(2, "docs-heading", "Files, selection, graphics, and rich text")),
+        Box::new(heading(
+            2,
+            "docs-heading",
+            locale.text("widgets-files-selection-graphics-and-rich-text"),
+        )),
         Box::new(copy(
             "docs-paragraph",
-            "Advanced controls use bounded configuration values. Select options have stable SemanticId keys, file pickers declare filters and budgets, graphics contain finite path commands, and rich editors consume a shared RichDocument.",
+            locale.text(
+                "widgets-advanced-controls-use-bounded-configuration-values-select-options-have",
+            ),
         )),
-        Box::new(code_panel(Theme::blue_dark(), "controls.rs", ADVANCED_CONTROLS, "docs-code")),
-        Box::new(heading(2, "docs-heading", "Choose the right composition tool")),
+        Box::new(code_panel(
+            locale,
+            Theme::blue_dark(),
+            "controls.rs",
+            ADVANCED_CONTROLS,
+            "docs-code",
+        )),
+        Box::new(heading(
+            2,
+            "docs-heading",
+            locale.text("widgets-choose-the-right-composition-tool"),
+        )),
         Box::new(view().class("docs-host-grid").fill((
-            view().class("docs-host-card").fill((heading(3, "docs-card-title", "row / col"), copy("", "Use these shortcuts for horizontal or vertical flex layout. A later style call replaces their prepared Style, so redeclare display and flex_direction when replacing it."))),
-            view().class("docs-host-card").fill((heading(3, "docs-card-title", "when"), copy("", "Mount a branch from a static or reactive boolean. otherwise supplies the alternate branch; changing branches disposes the old branch's owned work."))),
-            view().class("docs-host-card").fill((heading(3, "docs-card-title", "each / list"), copy("", "each mounts a complete keyed Vec and gives rows reactive item/index handles. list indexes a large source lazily and mounts only its visible window, overscan, and at most one focused row."))),
+            view().class("docs-host-card").fill(
+                (
+                    heading(3, "docs-card-title", locale.text("widgets-row-col")),
+                    copy(
+                        "",
+                        locale.text(
+                            "widgets-use-these-shortcuts-for-horizontal-or-vertical-flex-layout",
+                        ),
+                    ),
+                ),
+            ),
+            view().class("docs-host-card").fill((
+                heading(3, "docs-card-title", "when"),
+                copy("", locale.text("widgets-mount-a-branch-from-a-static-or-reactive-boolean")),
+            )),
+            view().class("docs-host-card").fill((
+                heading(3, "docs-card-title", locale.text("widgets-each-list")),
+                copy("", locale.text("widgets-each-mounts-a-complete-keyed-vec-and-gives-rows")),
+            )),
         ))),
-        Box::new(code_panel(Theme::blue_dark(), "collections.rs", CONTROL_FLOW, "docs-code")),
+        Box::new(code_panel(
+            locale,
+            Theme::blue_dark(),
+            "collections.rs",
+            CONTROL_FLOW,
+            "docs-code",
+        )),
         Box::new(copy(
             "docs-paragraph",
-            "Use stable keys in both collection builders. Prefer each for small complete collections; use list with a bounded key lookup and fixed or measured row heights for large scrollable data.",
+            locale.text("widgets-use-stable-keys-in-both-collection-builders-prefer-each"),
         )),
-        Box::new(doc_nav(Some(Route::Reactivity), Some(Route::CustomWidgets))),
+        Box::new(doc_nav(locale, Some(Route::Reactivity), Some(Route::CustomWidgets))),
     ];
-    docs_layout(Route::Widgets, view().fill(content))
+    docs_layout(locale, Route::Widgets, view().fill(content))
 }

@@ -1,5 +1,7 @@
 pub mod app;
 pub mod components;
+pub mod i18n;
+pub mod metadata;
 pub mod pages;
 pub mod routes;
 
@@ -7,4 +9,5 @@ pub mod routes;
 pub mod web;
 
 pub use app::{AppState, app};
-pub use routes::Route;
+pub use i18n::Locale;
+pub use routes::{Route, SiteRoute};

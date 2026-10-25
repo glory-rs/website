@@ -1729,3 +1729,22 @@ h3 {
     transform: none;
   }
 }
+
+.language-link {
+  color: var(--ink);
+  font-size: 0.8rem;
+  white-space: nowrap;
+  text-decoration: none;
+  padding: 0.4rem 0.2rem;
+}
+
+.language-link:hover { color: var(--teal); }
+.language-link:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+html[lang="zh-CN"] .hero-title { font-size: clamp(3rem, 6vw, 5.75rem); line-height: 1.25; }
+html[lang="zh-CN"] .docs-paragraph,
+html[lang="zh-CN"] .docs-lead { line-height: 1.9; }
+@media (max-width: 600px) {
+  .header-actions { gap: 0.55rem; }
+  .header-actions .version, .header-actions .github-link { display: none; }
+  html[lang="zh-CN"] .hero-title { font-size: clamp(2.3rem, 10vw, 3.5rem); }
+}

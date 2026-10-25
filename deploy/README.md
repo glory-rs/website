@@ -65,7 +65,11 @@ toolchains, Cargo caches/targets, npm cache, temporary files, and site output
 are under `D:/BuildCache/glory-website`. The workflow verifies Cargo's actual
 target directory before compiling the site.
 
-Native tests must pass before the release WASM/SSR build and deployment. The
+Native tests, strict native/WASM Clippy, and bilingual Chromium acceptance must
+pass before deployment. The browser gate uses the actual release WASM/SSR output
+and Playwright 1.60.0, with tools and browser downloads on D drive. It covers both
+languages, hydration identity, language switching, document metadata, live
+controls, localized 404 responses, and four viewport widths. The
 generated site is also retained as the `website-dist` Actions artifact for
 seven days, including when the later deployment step fails. Build-only checks
 do not require Cloudflare credentials.
@@ -80,8 +84,10 @@ Alternatively, pass `-Bindgen D:/path/to/wasm-bindgen.exe`. Output is
 `D:/BuildCache/glory-website/dist`. Each build removes the old output directory
 before generation. Individual assets above Pages' 25 MiB limit are rejected.
 
-All routes are prerendered to their own `index.html`, with a top-level
-`404.html`; Cloudflare serves the correct missing-page response. Do not add a
+English and `/zh/` routes are prerendered to their own `index.html`, with a
+top-level `404.html` and `/zh/404.html`; Cloudflare serves the nearest ancestor's
+missing-page document with a 404 status. Both languages are listed in
+`sitemap.xml` and connected by hreflang alternates. Do not add a
 catch-all SPA rewrite to `/index.html`, since hydration uses the matching route's
 SSR tree. Assets have stable filenames, so `_headers` requires revalidation
 instead of marking old JS/WASM as immutable.

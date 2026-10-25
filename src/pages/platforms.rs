@@ -1,3 +1,4 @@
+use crate::Locale;
 use crate::{Route, components::*};
 use glory::prelude::*;
 use sapid::Theme;
@@ -61,61 +62,61 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 #[cfg(not(any(target_os = "windows", target_os = "linux", target_os = "macos")))]
 fn main() {}"#;
 
-pub fn platforms() -> impl Widget {
+pub fn platforms(locale: Locale) -> impl Widget {
     let content: Vec<Box<dyn Widget>> = vec![
-        Box::new(copy("docs-kicker", "ONE TREE, MULTIPLE HOSTS")),
-        Box::new(heading(1, "docs-title", "Share widgets across platforms.")),
+        Box::new(copy("docs-kicker", locale.text("platforms-one-tree-multiple-hosts"))),
+        Box::new(heading(1, "docs-title", locale.text("platforms-share-widgets-across-platforms"))),
         Box::new(copy(
             "docs-lead",
-            "Keep application components in terms of Widget, Scope, semantic events, and typed styles. Put DOM lookup, HTML generation, window creation, and event loops in small host-specific entry points.",
+            locale.text("platforms-keep-application-components-in-terms-of-widget-scope-semantic"),
         )),
-        Box::new(heading(2, "docs-heading", "Write the shared component once")),
+        Box::new(heading(2, "docs-heading", locale.text("platforms-write-the-shared-component-once"))),
         Box::new(copy(
             "docs-paragraph",
-            "This component contains no web-sys, HTML document, or window types. Its Cage and event handler have the same ownership and update behavior wherever the widget is mounted.",
+            locale.text("platforms-this-component-contains-no-web-sys-html-document-or"),
         )),
-        Box::new(code_panel(Theme::blue_dark(), "shared.rs", SHARED_COUNTER, "docs-code")),
-        Box::new(heading(2, "docs-heading", "Forward only the features you use")),
+        Box::new(code_panel(locale, Theme::blue_dark(), "shared.rs", SHARED_COUNTER, "docs-code")),
+        Box::new(heading(2, "docs-heading", locale.text("platforms-forward-only-the-features-you-use"))),
         Box::new(copy(
             "docs-paragraph",
-            "Glory has no default host. Application features forward to facade features, keeping server, browser, and native dependency graphs explicit. web and ssr each select html; hydrate selects web; stream selects ssr and resources; blitz is native-only. For a progressive browser client, stream-web selects stream and hydrate (and therefore web); hydrate the application after the final End frame.",
+            locale.text("platforms-glory-has-no-default-host-application-features-forward-to"),
         )),
-        Box::new(code_panel(Theme::blue_dark(), "Cargo.toml", FEATURES, "docs-code")),
-        Box::new(heading(2, "docs-heading", "Choose the host entry point")),
-        Box::new(code_panel(Theme::blue_dark(), "web_and_server.rs", WEB_AND_SSR, "docs-code")),
+        Box::new(code_panel(locale, Theme::blue_dark(), "Cargo.toml", FEATURES, "docs-code")),
+        Box::new(heading(2, "docs-heading", locale.text("platforms-choose-the-host-entry-point"))),
+        Box::new(code_panel(locale, Theme::blue_dark(), "web_and_server.rs", WEB_AND_SSR, "docs-code")),
         Box::new(copy(
             "docs-paragraph",
-            "launch requires an empty, unclaimed browser mount. hydrate expects Glory's versioned SSR markers and validates the entire initial subtree before adopting it. The server has no browser input loop; interactivity begins with the browser host.",
+            locale.text("platforms-launch-requires-an-empty-unclaimed-browser-mount-hydrate-expects"),
         )),
-        Box::new(code_panel(Theme::blue_dark(), "desktop.rs", DESKTOP, "docs-code")),
+        Box::new(code_panel(locale, Theme::blue_dark(), "desktop.rs", DESKTOP, "docs-code")),
         Box::new(copy(
             "docs-paragraph",
-            "WindowApp owns the shared App and native document. Shell owns the desktop event loop and windows. Enable blitz-shell for this entry point; blitz-accesskit additionally enables the optional desktop accessibility bridge.",
+            locale.text("platforms-windowapp-owns-the-shared-app-and-native-document-shell"),
         )),
-        Box::new(heading(2, "docs-heading", "Capability matrix")),
+        Box::new(heading(2, "docs-heading", locale.text("platforms-capability-matrix"))),
         Box::new(view().class("docs-host-grid").fill((
-            view().class("docs-host-card").fill((heading(3, "docs-card-title", "Headless · no feature"), copy("", "App::memory() records the semantic tree and typed patches for tests. Profile::RECORD performs no layout. There is no physical input, focus, geometry, or platform action driver."))),
-            view().class("docs-host-card").fill((heading(3, "docs-card-title", "Web CSR · web"), copy("", "wasm32 DOM rendering with browser input, focus, measurement, scrolling, resources, and RAF scheduling. launch creates a new tree; keep WebApp alive."))),
-            view().class("docs-host-card").fill((heading(3, "docs-card-title", "SSR · ssr"), copy("", "Native synchronous HTML strings, documents, and versioned snapshots through render, render_document, and snapshot. Event interests are recorded, but SSR has no physical input or geometry."))),
-            view().class("docs-host-card").fill((heading(3, "docs-card-title", "Hydration · hydrate"), copy("", "Browser adoption of a compatible SSR snapshot through hydrate or hydrate_with. It includes web, validates before changing the DOM, and preserves the mount on mismatch."))),
-            view().class("docs-host-card").fill((heading(3, "docs-card-title", "Streaming · stream"), copy("", "Native pull-driven Shell/Patch/End output with request resources and cancellation. Add web for the classic pre-edit script and hydrate for final application ownership; streaming alone is not a browser input host."))),
-            view().class("docs-host-card").fill((heading(3, "docs-card-title", "Blitz document · blitz"), copy("", "Native headless CSS/box/text layout, measurement, and programmatic scrolling. Optional paint/raster adds frames or CPU images. A standalone Renderer has no OS input driver."))),
-            view().class("docs-host-card").fill((heading(3, "docs-card-title", "Blitz desktop · blitz-shell"), copy("", "WindowApp and Shell add CPU desktop windows, activation, focus, navigation, controlled editing, and IME protocol integration on the desktop targets. AccessKit is a separate opt-in."))),
+            view().class("docs-host-card").fill((heading(3, "docs-card-title", locale.text("platforms-headless-no-feature")), copy("", locale.text("platforms-app-memory-records-the-semantic-tree-and-typed-patches")))),
+            view().class("docs-host-card").fill((heading(3, "docs-card-title", locale.text("platforms-web-csr-web")), copy("", locale.text("platforms-wasm32-dom-rendering-with-browser-input-focus-measurement-scrolling")))),
+            view().class("docs-host-card").fill((heading(3, "docs-card-title", locale.text("platforms-ssr-ssr")), copy("", locale.text("platforms-native-synchronous-html-strings-documents-and-versioned-snapshots-through")))),
+            view().class("docs-host-card").fill((heading(3, "docs-card-title", locale.text("platforms-hydration-hydrate")), copy("", locale.text("platforms-browser-adoption-of-a-compatible-ssr-snapshot-through-hydrate")))),
+            view().class("docs-host-card").fill((heading(3, "docs-card-title", locale.text("platforms-streaming-stream")), copy("", locale.text("platforms-native-pull-driven-shell-patch-end-output-with-request")))),
+            view().class("docs-host-card").fill((heading(3, "docs-card-title", locale.text("platforms-blitz-document-blitz")), copy("", locale.text("platforms-native-headless-css-box-text-layout-measurement-and-programmatic")))),
+            view().class("docs-host-card").fill((heading(3, "docs-card-title", locale.text("platforms-blitz-desktop-blitz-shell")), copy("", locale.text("platforms-windowapp-and-shell-add-cpu-desktop-windows-activation-focus")))),
         ))),
         Box::new(view().class("docs-callout").fill((
-            copy("docs-callout-title", "Sharing semantics does not erase platform differences"),
-            copy("", "Cross-platform widgets do not guarantee pixel-identical output. Fonts, shaping, viewport/DPI behavior, CSS coverage, and native presentation differ. A green headless test proves neither layout nor displayed pixels, and neither headless memory nor a standalone Blitz Renderer supplies user input."),
+            copy("docs-callout-title", locale.text("platforms-sharing-semantics-does-not-erase-platform-differences")),
+            copy("", locale.text("platforms-cross-platform-widgets-do-not-guarantee-pixel-identical-output")),
         ))),
-        Box::new(heading(2, "docs-heading", "Keep current platform limits explicit")),
+        Box::new(heading(2, "docs-heading", locale.text("platforms-keep-current-platform-limits-explicit"))),
         Box::new(copy(
             "docs-paragraph",
-            "The desktop shell is gated to Windows, Linux, and macOS; it is not an Android host. Android Activity/Surface integration, mobile resources, input connections, and device acceptance remain separate work. Do not infer mobile support from an Android compile check or from desktop winit dependencies.",
+            locale.text("platforms-the-desktop-shell-is-gated-to-windows-linux-and"),
         )),
         Box::new(copy(
             "docs-paragraph",
-            "IME protocol handling is not proof that every operating-system IME works. Likewise, the optional AccessKit bridge and Windows UI Automation evidence are not screen-reader acceptance. Unix AT-SPI client checks, spoken announcements, complete text-selection interfaces, OS IME behavior, and mobile accessibility still require platform-specific validation.",
+            locale.text("platforms-ime-protocol-handling-is-not-proof-that-every-operating"),
         )),
-        Box::new(doc_nav(Some(Route::Ssr), None)),
+        Box::new(doc_nav(locale, Some(Route::Ssr), None)),
     ];
-    docs_layout(Route::Platforms, view().fill(content))
+    docs_layout(locale, Route::Platforms, view().fill(content))
 }

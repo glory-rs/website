@@ -1,4 +1,4 @@
-use crate::{AppState, Route};
+use crate::{AppState, Locale, Route, SiteRoute, metadata};
 use std::cell::RefCell;
 use wasm_bindgen::{JsValue, prelude::*};
 
@@ -16,15 +16,65 @@ fn window() -> Result<web_sys::Window, String> {
     web_sys::window().ok_or_else(|| "Missing browser window".to_owned())
 }
 
-fn route(window: &web_sys::Window) -> Result<Route, String> {
+fn route(window: &web_sys::Window) -> Result<SiteRoute, String> {
     let path = window.location().pathname().map_err(|_| "Missing URL path")?;
-    Ok(Route::parse(&path))
+    Ok(SiteRoute::parse(&path))
 }
 
-fn present(route: Route) -> Result<(), String> {
+fn present(route: SiteRoute) -> Result<(), String> {
     let window = window()?;
     let document = window.document().ok_or("Missing browser document")?;
-    document.set_title(route.title());
+    document.set_title(&route.title());
+    if let Some(html) = document.document_element() {
+        html.set_attribute("lang", route.locale.tag())
+            .map_err(|_| "Could not set document language")?;
+    }
+    let set = |selector: &str, name: &str, value: &str| -> Result<(), String> {
+        document
+            .query_selector(selector)
+            .map_err(|_| "Invalid metadata selector")?
+            .ok_or_else(|| format!("Missing metadata {selector}"))?
+            .set_attribute(name, value)
+            .map_err(|_| "Could not update metadata".to_owned())
+    };
+    set("meta[name=description]", "content", &route.description())?;
+    set("meta[property='og:title']", "content", &route.title())?;
+    set("meta[property='og:description']", "content", &route.description())?;
+    set("meta[property='og:url']", "content", &metadata::canonical(route))?;
+    set("link[rel=canonical]", "href", &metadata::canonical(route))?;
+    // These belong to the outer document, outside Glory's hydrated root.
+    let nodes = document
+        .query_selector_all("link[rel=alternate][hreflang], meta[name=robots]")
+        .map_err(|_| "Invalid metadata selector")?;
+    for index in 0..nodes.length() {
+        if let Some(node) = nodes.item(index)
+            && let Some(parent) = node.parent_node()
+        {
+            let _ = parent.remove_child(&node);
+        }
+    }
+    let head =
+        document.query_selector("head").map_err(|_| "Missing head")?.ok_or("Missing head")?;
+    if route.page == Route::NotFound {
+        let meta = document.create_element("meta").map_err(|_| "Could not create metadata")?;
+        meta.set_attribute("name", "robots").map_err(|_| "Could not set metadata")?;
+        meta.set_attribute("content", "noindex").map_err(|_| "Could not set metadata")?;
+        head.append_child(&meta).map_err(|_| "Could not append metadata")?;
+    } else {
+        for (tag, locale) in
+            [("en", Locale::En), ("zh-CN", Locale::ZhCn), ("x-default", Locale::En)]
+        {
+            let link = document.create_element("link").map_err(|_| "Could not create metadata")?;
+            for (key, value) in [
+                ("rel", "alternate"),
+                ("hreflang", tag),
+                ("href", &metadata::canonical(SiteRoute::new(locale, route.page))),
+            ] {
+                link.set_attribute(key, value).map_err(|_| "Could not set metadata")?;
+            }
+            head.append_child(&link).map_err(|_| "Could not append metadata")?;
+        }
+    }
     window.scroll_to_with_x_and_y(0.0, 0.0);
     Ok(())
 }
@@ -40,7 +90,7 @@ pub fn navigate(href: &str) -> Result<(), String> {
     if url.origin() != window.location().origin().map_err(|_| "Missing URL origin")? {
         return Err("External links use native browser navigation".to_owned());
     }
-    let next = Route::parse(&url.pathname());
+    let next = SiteRoute::parse(&url.pathname());
     window
         .history()
         .map_err(|_| "Missing browser history")?
