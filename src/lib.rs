@@ -1,5 +1,6 @@
 pub mod app;
 pub mod components;
+pub mod examples;
 pub mod i18n;
 pub mod metadata;
 pub mod pages;

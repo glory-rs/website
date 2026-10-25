@@ -32,6 +32,7 @@ fn page(route: SiteRoute) -> Box<dyn Widget> {
         Route::Widgets => Box::new(pages::widgets(locale)),
         Route::CustomWidgets => Box::new(pages::custom_widgets(locale)),
         Route::Styling => Box::new(pages::styling(locale)),
+        Route::I18n => Box::new(pages::i18n(locale)),
         Route::Web => Box::new(pages::web(locale)),
         Route::Ssr => Box::new(pages::ssr(locale)),
         Route::Platforms => Box::new(pages::platforms(locale)),

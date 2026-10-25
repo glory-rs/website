@@ -34,6 +34,12 @@ impl Locale {
             Self::ZhCn => Self::En,
         }
     }
+    pub fn native_name(self) -> &'static str {
+        match self {
+            Self::En => "English",
+            Self::ZhCn => "简体中文",
+        }
+    }
     pub fn context(self) -> I18n {
         I18n::new(catalog(), self.tag().parse::<glory::i18n::Locale>().expect("static locale"))
     }

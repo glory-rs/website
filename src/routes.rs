@@ -52,6 +52,7 @@ pub enum Route {
     Widgets,
     CustomWidgets,
     Styling,
+    I18n,
     Web,
     Ssr,
     Platforms,
@@ -59,7 +60,7 @@ pub enum Route {
 }
 
 impl Route {
-    pub const ALL: [Route; 10] = [
+    pub const ALL: [Route; 11] = [
         Route::Home,
         Route::Docs,
         Route::Architecture,
@@ -67,6 +68,7 @@ impl Route {
         Route::Widgets,
         Route::CustomWidgets,
         Route::Styling,
+        Route::I18n,
         Route::Web,
         Route::Ssr,
         Route::Platforms,
@@ -83,6 +85,7 @@ impl Route {
             "/docs/widgets" | "/docs/widgets/index.html" => Self::Widgets,
             "/docs/custom-widgets" | "/docs/custom-widgets/index.html" => Self::CustomWidgets,
             "/docs/styling" | "/docs/styling/index.html" => Self::Styling,
+            "/docs/i18n" | "/docs/i18n/index.html" => Self::I18n,
             "/docs/web" | "/docs/web/index.html" => Self::Web,
             "/docs/ssr" | "/docs/ssr/index.html" => Self::Ssr,
             "/docs/platforms" | "/docs/platforms/index.html" => Self::Platforms,
@@ -99,6 +102,7 @@ impl Route {
             Self::Widgets => "/docs/widgets/",
             Self::CustomWidgets => "/docs/custom-widgets/",
             Self::Styling => "/docs/styling/",
+            Self::I18n => "/docs/i18n/",
             Self::Web => "/docs/web/",
             Self::Ssr => "/docs/ssr/",
             Self::Platforms => "/docs/platforms/",
@@ -115,6 +119,7 @@ impl Route {
             Self::Widgets => locale.text("meta-built-in-widgets-glory"),
             Self::CustomWidgets => locale.text("meta-writing-custom-widgets-glory"),
             Self::Styling => locale.text("meta-styling-and-assets-glory"),
+            Self::I18n => locale.text("i18n-meta-title"),
             Self::Web => locale.text("meta-web-applications-glory"),
             Self::Ssr => locale.text("meta-ssr-and-hydration-glory"),
             Self::Platforms => locale.text("meta-cross-platform-applications-glory"),
@@ -145,6 +150,7 @@ impl Route {
             Self::Styling => {
                 locale.text("meta-use-typed-styles-external-css-and-bounded-stylesheets-across")
             }
+            Self::I18n => locale.text("i18n-meta-description"),
             Self::Web => {
                 locale.text("meta-launch-and-hydrate-a-glory-application-in-a-webassembly")
             }

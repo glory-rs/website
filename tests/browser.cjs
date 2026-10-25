@@ -16,6 +16,10 @@ const plain = text => text.replace(/[\u2068\u2069]/g, '');
     browser = await chromium.launch({ headless: true });
     const context = await browser.newContext({ permissions: ['clipboard-read', 'clipboard-write'] });
     const page = await context.newPage();
+    const chooseLanguage = async (name) => {
+      await page.locator('.language-picker').getByRole('button').click();
+      await page.getByRole('menuitem', { name, exact: true }).click();
+    };
     page.on('pageerror', error => report.errors.push(error.message));
     page.on('console', message => {
       if (message.type() === 'error' && !message.text().includes('status of 404')) report.errors.push(message.text());
@@ -63,7 +67,7 @@ const plain = text => text.replace(/[\u2068\u2069]/g, '');
     for (const width of [1280, 768, 390, 320]) {
       await page.setViewportSize({ width, height: 800 });
       for (const prefix of ['', '/zh']) {
-        for (const chapter of ['/', '/docs/', '/docs/architecture/', '/docs/reactivity/', '/docs/widgets/', '/docs/custom-widgets/', '/docs/styling/', '/docs/web/', '/docs/ssr/', '/docs/platforms/']) {
+        for (const chapter of ['/', '/docs/', '/docs/architecture/', '/docs/reactivity/', '/docs/widgets/', '/docs/custom-widgets/', '/docs/styling/', '/docs/i18n/', '/docs/web/', '/docs/ssr/', '/docs/platforms/']) {
           const path = prefix + chapter;
           await page.goto(`${base}${path}`);
           await page.waitForFunction(() => window.gloryReady === true);
@@ -105,7 +109,7 @@ const plain = text => text.replace(/[\u2068\u2069]/g, '');
       const el = document.querySelector('.docs-title'); window.testHeading = el; return !!el;
     });
     assert.ok(identity);
-    await page.getByRole('link', { name: 'Switch to Simplified Chinese', exact: true }).click();
+    await chooseLanguage('简体中文');
     await page.waitForURL('**/zh/docs/web/?source=language#example');
     await page.getByRole('heading', { name: 'Web 应用。', exact: true }).waitFor();
     assert.equal(await page.locator('html').getAttribute('lang'), 'zh-CN');
@@ -116,7 +120,7 @@ const plain = text => text.replace(/[\u2068\u2069]/g, '');
     assert.match(await page.locator('meta[name=description]').getAttribute('content'), /浏览器/);
     // Soft navigation replaces the language-keyed page, not the document.
     assert.equal(await page.evaluate(() => !!window.testHeading && !window.testHeading.isConnected), true);
-    await page.getByRole('link', { name: '切换到英文', exact: true }).click();
+    await chooseLanguage('English');
     await page.waitForURL('**/docs/web/?source=language#example');
     await page.getByRole('heading', { name: 'Web applications.', exact: true }).waitFor();
     await page.goBack();
@@ -172,16 +176,79 @@ const plain = text => text.replace(/[\u2068\u2069]/g, '');
     }
     const xml = await context.request.get(`${base}/sitemap.xml`);
     assert.equal(xml.status(), 200);
-    assert.equal((await xml.text()).match(/<url>/g).length, 20);
+    assert.equal((await xml.text()).match(/<url>/g).length, 22);
     check('Chinese no-JS SSR, localized real 404 responses and bilingual sitemap');
+
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.goto(`${base}/docs/`);
+    await page.waitForFunction(() => window.gloryReady === true);
+    await page.getByRole('navigation', { name: 'Documentation', exact: true })
+      .getByRole('link', { name: 'Internationalization', exact: true }).click();
+    await page.waitForURL('**/docs/i18n/');
+    await page.getByRole('heading', { name: 'Internationalization with glory-i18n.', exact: true }).waitFor();
+    assert.equal(await page.getByRole('navigation', { name: 'Documentation', exact: true }).locator('[aria-current="page"]').count(), 1);
+    const demo = page.locator('.i18n-demo');
+    assert.equal(plain(await demo.locator('.i18n-demo-message').textContent()), 'You have one message.');
+    await demo.getByRole('button', { name: 'Add a message', exact: true }).click();
+    await page.waitForFunction(() => document.querySelector('.i18n-demo-message').textContent.replace(/[\u2068\u2069]/g, '') === 'You have 2 messages.');
+    await demo.getByRole('button', { name: '简体中文', exact: true }).click();
+    await page.waitForFunction(() => document.querySelector('.i18n-demo-message').textContent.replace(/[\u2068\u2069]/g, '') === '你有 2 条消息。');
+    await demo.getByRole('button', { name: '增加一条消息', exact: true }).click();
+    await demo.getByRole('button', { name: 'English', exact: true }).click();
+    await page.waitForFunction(() => document.querySelector('.i18n-demo-message').textContent.replace(/[\u2068\u2069]/g, '') === 'You have 3 messages.');
+    check('Guide examples hydrate, select English plurals and retain count during reactive language changes');
+
+    await page.goto(`${base}/docs/i18n/?source=guide#demo`);
+    await page.waitForFunction(() => window.gloryReady === true);
+    const picker = page.locator('.language-picker').getByRole('button', { name: 'English', exact: true });
+    await picker.focus();
+    await picker.press('Enter');
+    await page.getByRole('menu', { name: 'English', exact: true }).waitFor();
+    assert.equal(await picker.getAttribute('aria-expanded'), 'true');
+    assert.equal(await page.getByRole('menuitem').count(), 2);
+    await page.getByRole('menuitem', { name: 'English', exact: true }).press('ArrowDown');
+    await page.waitForFunction(() => document.activeElement?.textContent === '简体中文');
+    await page.getByRole('menuitem', { name: '简体中文', exact: true }).press('Enter');
+    await page.waitForURL('**/zh/docs/i18n/?source=guide#demo');
+    await page.getByRole('heading', { name: '使用 glory-i18n 实现国际化。', exact: true }).waitFor();
+    assert.equal(await page.locator('html').getAttribute('lang'), 'zh-CN');
+    assert.equal(await page.locator('link[rel=canonical]').getAttribute('href'), 'https://glory.taidge.com/zh/docs/i18n/');
+    const zhPicker = page.locator('.language-picker').getByRole('button', { name: '简体中文', exact: true });
+    await zhPicker.click();
+    await page.getByRole('menuitem', { name: 'English', exact: true }).press('Escape');
+    await page.getByRole('menu', { name: '简体中文', exact: true }).waitFor({ state: 'hidden' });
+    assert.equal(await zhPicker.getAttribute('aria-expanded'), 'false');
+    await zhPicker.click();
+    await page.locator('.docs-title').click();
+    await page.getByRole('menu', { name: '简体中文', exact: true }).waitFor({ state: 'hidden' });
+    check('Language dropdown shows two supported languages and handles keyboard, Escape and outside dismissal');
+
+    await page.setViewportSize({ width: 320, height: 800 });
+    await zhPicker.click();
+    const menuBounds = await page.getByRole('menu', { name: '简体中文', exact: true }).boundingBox();
+    assert.ok(menuBounds.x >= 0 && menuBounds.x + menuBounds.width <= 320, JSON.stringify(menuBounds));
+    await page.getByRole('menuitem', { name: '简体中文', exact: true }).click();
+    await page.getByRole('menu', { name: '简体中文', exact: true }).waitFor({ state: 'hidden' });
+    assert.ok(page.url().endsWith('/zh/docs/i18n/?source=guide#demo'));
+    const staticGuide = await browser.newContext({ javaScriptEnabled: false });
+    for (const [prefix, name] of [['', 'Internationalization with glory-i18n.'], ['/zh', '使用 glory-i18n 实现国际化。']]) {
+      const staticGuidePage = await staticGuide.newPage();
+      await staticGuidePage.goto(`${base}${prefix}/docs/i18n/`);
+      await staticGuidePage.getByRole('heading', { name, exact: true }).waitFor();
+      assert.match(await staticGuidePage.locator('.docs-article').textContent(), /hydrate_with/);
+    }
+    await staticGuide.close();
+    check('Both guide routes render without JavaScript; dropdown fits 320px and current selection keeps its URL');
 
     await page.setViewportSize({ width: 1440, height: 1000 });
     await page.goto(`${base}/zh/`);
     await page.waitForFunction(() => window.gloryReady === true);
     await page.screenshot({ path: 'D:/BuildCache/glory-website/zh-home.png', fullPage: false });
-    await page.goto(`${base}/zh/docs/architecture/`);
+    await page.goto(`${base}/zh/docs/i18n/`);
     await page.waitForFunction(() => window.gloryReady === true);
-    await page.screenshot({ path: 'D:/BuildCache/glory-website/zh-architecture.png', fullPage: false });
+    await zhPicker.click();
+    await page.getByRole('menu', { name: '简体中文', exact: true }).waitFor();
+    await page.screenshot({ path: 'D:/BuildCache/glory-website/zh-i18n-guide.png', fullPage: false });
 
     assert.deepEqual(report.errors, [], 'Browser console and hydration errors');
     check('No browser console or hydration errors');

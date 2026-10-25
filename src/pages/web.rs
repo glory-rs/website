@@ -227,7 +227,7 @@ pub fn web(locale: Locale) -> impl Widget {
             copy("docs-callout-title", locale.text("web-the-complete-startup-contract")),
             copy("", locale.text("web-build-for-wasm32-with-web-look-up-a-web")),
         ))),
-        Box::new(doc_nav(locale, Some(Route::Styling), Some(Route::Ssr))),
+        Box::new(doc_nav(locale, Some(Route::I18n), Some(Route::Ssr))),
     ];
     docs_layout(locale, Route::Web, view().fill(content))
 }

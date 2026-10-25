@@ -25,27 +25,41 @@ pub fn external(label: impl Into<String>, href: &str, class: &str) -> sapid::Anc
     sapid::anchor().unstyled().href(href.to_owned()).label(label.into()).class(class.to_owned())
 }
 
-fn language_link(locale: Locale, page: Route) -> sapid::Anchor {
-    let target = crate::SiteRoute::new(locale.other(), page).path();
-    sapid::anchor()
+fn language_picker(locale: Locale, page: Route) -> impl Widget {
+    let mut menu = sapid::dropdown_menu(format!("site-language-{}-{page:?}", locale.tag()))
         .unstyled()
-        .class("language-link")
-        .label(locale.text("language-switch"))
-        .name(locale.text("language-switch-name"))
-        .href(target)
-        .on_navigate(move |mut request| {
-            #[cfg(target_arch = "wasm32")]
-            if let Some(window) = web_sys::window() {
-                let location = window.location();
-                request.href = crate::SiteRoute::new(locale, page).switch_path(
-                    &location.search().unwrap_or_default(),
-                    &location.hash().unwrap_or_default(),
-                );
-            }
-            #[cfg(not(target_arch = "wasm32"))]
-            let _ = &mut request;
-            request_navigation(request);
-        })
+        .class("language-options")
+        .label(locale.native_name());
+    for target in Locale::ALL {
+        menu = menu.item(
+            sapid::menu_item(target.tag())
+                .label(target.native_name())
+                .class(if target == locale {
+                    "language-option is-current"
+                } else {
+                    "language-option"
+                })
+                .on_activate(move || {
+                    if target == locale {
+                        return;
+                    }
+                    #[cfg(target_arch = "wasm32")]
+                    if let Some(window) = web_sys::window() {
+                        let location = window.location();
+                        let href = crate::SiteRoute::new(locale, page).switch_path(
+                            &location.search().unwrap_or_default(),
+                            &location.hash().unwrap_or_default(),
+                        );
+                        if let Err(error) = crate::web::navigate(&href) {
+                            web_sys::console::error_1(&error.into());
+                        }
+                    }
+                    #[cfg(not(target_arch = "wasm32"))]
+                    let _ = page;
+                }),
+        );
+    }
+    view().name(locale.text("language-menu")).class("language-picker").fill(menu)
 }
 
 fn nav_link(
@@ -55,7 +69,7 @@ fn nav_link(
     current: Route,
     mobile: bool,
 ) -> sapid::Anchor {
-    let active = current == route || (route == Route::Docs && current == Route::Reactivity);
+    let active = current == route;
     let class = format!(
         "{}{}",
         if mobile { "mobile-nav-link" } else { "nav-link" },
@@ -66,6 +80,8 @@ fn nav_link(
 
 pub fn header(locale: Locale, current: Route) -> impl Widget {
     widget(move |scope| {
+        let docs_current =
+            if matches!(current, Route::Reactivity | Route::I18n) { Route::Docs } else { current };
         let open = scope.cage(false);
         let menu_label =
             open.map(
@@ -91,7 +107,7 @@ pub fn header(locale: Locale, current: Route) -> impl Widget {
                                 locale,
                                 locale.text("common-docs"),
                                 Route::Docs,
-                                current,
+                                docs_current,
                                 false,
                             ),
                             nav_link(
@@ -120,7 +136,7 @@ pub fn header(locale: Locale, current: Route) -> impl Widget {
                     view().class("header-actions").fill((
                         copy("version", "v0.3.1"),
                         external("GitHub", "https://github.com/glory-rs/glory", "github-link"),
-                        language_link(locale, current),
+                        language_picker(locale, current),
                         sapid::button()
                             .unstyled()
                             .class("menu-button")
@@ -229,6 +245,17 @@ pub fn code_panel(
     source: &str,
     class: &str,
 ) -> impl Widget {
+    source_panel(locale, theme, name, source, class, sapid::CodeLanguage::Rust)
+}
+
+pub fn source_panel(
+    locale: Locale,
+    theme: Theme,
+    name: &str,
+    source: &str,
+    class: &str,
+    language: sapid::CodeLanguage,
+) -> impl Widget {
     view().class(format!("code-panel {class}")).fill((
         view().class("code-header").fill((
             copy("code-file", name.to_owned()),
@@ -240,7 +267,7 @@ pub fn code_panel(
         )),
         sapid::code_highlight()
             .theme(theme)
-            .language(sapid::CodeLanguage::Rust)
+            .language(language)
             .source(source.to_owned())
             .line_numbers(true)
             .class("code-content"),
@@ -314,6 +341,7 @@ pub fn docs_layout(locale: Locale, current: Route, content: impl Widget) -> impl
             false,
         )),
         Box::new(nav_link(locale, locale.text("common-styling"), Route::Styling, current, false)),
+        Box::new(nav_link(locale, locale.text("i18n-nav"), Route::I18n, current, false)),
         Box::new(copy("docs-sidebar-title", locale.text("common-rendering-platforms"))),
         Box::new(nav_link(locale, locale.text("common-web"), Route::Web, current, false)),
         Box::new(nav_link(locale, locale.text("common-ssr-hydration"), Route::Ssr, current, false)),

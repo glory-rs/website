@@ -13,6 +13,7 @@ The content focuses on Glory itself: its design principles, built-in semantic wi
 - `/docs/widgets/` — Glory's built-in elements, control flow, and lists
 - `/docs/custom-widgets/` — implementing the Widget trait in Rust
 - `/docs/styling/` — typed styles, external CSS, and bounded stylesheets
+- `/docs/i18n/` — Fluent catalogs, language switching, parameters/plurals, and SSR hydration
 - `/docs/web/` — WebAssembly launch and browser host lifecycle
 - `/docs/ssr/` — HTML, snapshots, hydration, resources, and streaming
 - `/docs/platforms/` — Web, SSR, and Blitz desktop capabilities and boundaries
@@ -34,10 +35,18 @@ and code examples are shared Rust. Add matching message IDs and variable names
 in both resources. Native tests reject incomplete resources and resolve every
 message, including the live counter's parameterized label.
 
-Static generation emits 20 localized content pages, English and Chinese 404
+Static generation emits 22 localized content pages, English and Chinese 404
 documents, language alternates, canonical URLs, `sitemap.xml` and `robots.txt`.
 Client navigation updates the same document metadata. Cloudflare Pages selects
 the nearest ancestor 404; keep both `/404.html` and `/zh/404.html` in the artifact.
+
+The header language menu lists English and 简体中文, with keyboard navigation,
+Escape/outside dismissal, and the current language highlighted. The i18n guide
+includes a live language/plural demo and displays the same Rust/Fluent example
+files compiled by the site. Native tests exercise parameters, plural cases,
+reactive switching and the SSR example; the browser gate checks hydration,
+the language menu and demo in both guide routes. Example resources live in
+`locales/demo.*.ftl`, and modules in `src/examples/`.
 
 ## Automatic deployment
 

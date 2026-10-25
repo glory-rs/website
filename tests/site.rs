@@ -48,6 +48,7 @@ fn every_route_has_complete_ssr_content_and_navigation() {
             Route::Widgets => assert!(html.contains("Compose with built-in widgets.")),
             Route::CustomWidgets => assert!(html.contains("Writing custom widgets.")),
             Route::Styling => assert!(html.contains("Style without losing the boundaries.")),
+            Route::I18n => assert!(html.contains("Internationalization with glory-i18n.")),
             Route::Web => assert!(html.contains("Web applications.")),
             Route::Ssr => assert!(html.contains("SSR and hydration.")),
             Route::Platforms => assert!(html.contains("Share widgets across platforms.")),
@@ -140,7 +141,7 @@ fn chinese_pages_render_translated_content_links_and_metadata() {
         assert!(html.contains("主导航"), "{page:?}");
         assert!(html.contains("href=\"/zh/docs/\""), "{page:?}");
         assert!(html.contains("href=\"/zh/docs/widgets/\""), "{page:?}");
-        assert!(html.contains("切换到英文"));
+        assert!(html.contains("language-picker"));
         if !matches!(page, Route::Home | Route::NotFound) {
             assert!(html.contains("核心概念"));
             assert!(html.contains("教程翻页导航"));
@@ -166,7 +167,7 @@ fn chinese_pages_render_translated_content_links_and_metadata() {
     assert!(home.contains("每一种界面。"));
     assert!(home.contains("点击次数："));
     let sitemap = metadata::sitemap();
-    assert_eq!(sitemap.matches("<url>").count(), 20);
+    assert_eq!(sitemap.matches("<url>").count(), 22);
     assert!(!sitemap.contains("404.html"));
 }
 

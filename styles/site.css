@@ -1730,16 +1730,68 @@ h3 {
   }
 }
 
-.language-link {
-  color: var(--ink);
+.language-picker { flex-shrink: 0; }
+.language-picker .sapid-menu-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.5rem 0.2rem;
+  border: 0;
+  color: #19a7ff;
+  background: transparent;
   font-size: 0.8rem;
+  font-weight: 600;
   white-space: nowrap;
-  text-decoration: none;
-  padding: 0.4rem 0.2rem;
+  cursor: pointer;
 }
-
-.language-link:hover { color: var(--teal); }
-.language-link:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+.language-picker .sapid-menu-trigger::after {
+  content: "";
+  width: 0.4rem;
+  height: 0.4rem;
+  border-right: 1px solid currentColor;
+  border-bottom: 1px solid currentColor;
+  transform: translateY(-2px) rotate(45deg);
+}
+.language-picker .sapid-menu-trigger[aria-expanded="true"]::after {
+  transform: translateY(2px) rotate(225deg);
+}
+.language-picker .sapid-menu-trigger:focus-visible {
+  outline: 2px solid #19a7ff;
+  outline-offset: 3px;
+  border-radius: 0.25rem;
+}
+.language-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  width: 8rem;
+  max-width: calc(100vw - 1rem);
+  padding: 0.5rem;
+  border: 1px solid #363636;
+  border-radius: 0.55rem;
+  background: #111;
+  color: #e8e8e8;
+  box-shadow: 0 8px 24px #0006;
+}
+.language-options .language-option {
+  width: 100%;
+  padding: 0.5rem;
+  border: 0;
+  border-radius: 0.25rem;
+  color: inherit;
+  background: transparent;
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.5;
+  text-align: start;
+  cursor: pointer;
+}
+.language-options .is-current { color: #19a7ff; }
+.language-options .language-option:hover,
+.language-options .language-option:focus-visible { background: #232323; outline: none; }
+.i18n-demo { gap: 1rem; }
+.i18n-demo-message { font-size: 1.125rem; }
+.i18n-demo-actions { flex-wrap: wrap; gap: 0.65rem; }
 html[lang="zh-CN"] .hero-title { font-size: clamp(3rem, 6vw, 5.75rem); line-height: 1.25; }
 html[lang="zh-CN"] .docs-paragraph,
 html[lang="zh-CN"] .docs-lead { line-height: 1.9; }
