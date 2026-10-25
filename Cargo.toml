@@ -1,0 +1,24 @@
+[package]
+name = "glory-website"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.94"
+publish = false
+
+[workspace]
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+glory = { path = "../glory/crates/glory", version = "0.3.1", default-features = false, features = ["web", "ssr", "hydrate"] }
+sapid = { path = "../sapid", version = "0.1.0", features = ["code"] }
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+wasm-bindgen = "=0.2.129"
+web-sys = { version = "=0.3.106", features = ["Window", "Document", "Element", "Location", "Url", "History", "PopStateEvent", "HtmlElement"] }
+
+[profile.release]
+lto = true
+opt-level = "z"
+codegen-units = 1

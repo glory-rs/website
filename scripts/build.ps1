@@ -1,0 +1,70 @@
+param(
+    [switch]$Serve,
+    [switch]$Browser,
+    [string]$BuildRoot = 'D:/BuildCache/glory-website',
+    [string]$Bindgen = 'D:/BuildCache/codmin-glory/tools/bin/wasm-bindgen.exe'
+)
+$ErrorActionPreference = 'Stop'
+$projectRoot = Split-Path -Parent $PSScriptRoot
+$savedEnvironment = @{}
+$environmentNames = @('CARGO_HOME','CARGO_TARGET_DIR','CARGO_BUILD_JOBS','CARGO_INCREMENTAL','TEMP','TMP','PYTHONPYCACHEPREFIX','GLORY_WEBSITE_BASE')
+foreach ($name in $environmentNames) { $savedEnvironment[$name] = [Environment]::GetEnvironmentVariable($name, 'Process') }
+function Invoke-WebsiteCargo {
+    param([string[]]$Arguments)
+    & cargo @Arguments
+    if ($LASTEXITCODE -ne 0) { throw "website cargo failed: $($Arguments -join ' ')" }
+}
+Push-Location $projectRoot
+try {
+    $env:CARGO_HOME = 'D:/BuildCache/glory-semantic-ui/cargo'
+    $env:CARGO_TARGET_DIR = "$BuildRoot/target"
+    $env:CARGO_BUILD_JOBS = '2'
+    $env:CARGO_INCREMENTAL = '0'
+    $env:TEMP = "$BuildRoot/tmp"
+    $env:TMP = $env:TEMP
+    $env:PYTHONPYCACHEPREFIX = "$BuildRoot/pycache"
+    $dist = "$BuildRoot/dist"
+    New-Item -ItemType Directory -Force -Path $dist,$env:TEMP | Out-Null
+    $metadata = & cargo metadata --locked --no-deps --format-version 1 | ConvertFrom-Json
+    if ($LASTEXITCODE -ne 0) { throw 'website metadata failed' }
+    if ([IO.Path]::GetFullPath($metadata.target_directory) -ne [IO.Path]::GetFullPath($env:CARGO_TARGET_DIR)) { throw "Unexpected website target: $($metadata.target_directory)" }
+    Write-Output "Website target verified: $($metadata.target_directory)"
+    if ((& $Bindgen --version).Trim() -ne 'wasm-bindgen 0.2.129') { throw 'website requires wasm-bindgen-cli 0.2.129' }
+    Invoke-WebsiteCargo -Arguments @('build','--locked','--lib','--target','wasm32-unknown-unknown')
+    & $Bindgen "$env:CARGO_TARGET_DIR/wasm32-unknown-unknown/debug/glory_website.wasm" --target web --out-dir $dist
+    if ($LASTEXITCODE -ne 0) { throw 'website wasm-bindgen failed' }
+    Copy-Item -LiteralPath styles/site.css -Destination "$dist/site.css" -Force
+    Copy-Item -LiteralPath ../sapid/styles/sapid.css -Destination "$dist/sapid.css" -Force
+    New-Item -ItemType Directory -Force -Path "$dist/assets" | Out-Null
+    Copy-Item -Path assets/* -Destination "$dist/assets" -Force
+    Invoke-WebsiteCargo -Arguments @('run','--locked','--bin','generate','--',$dist)
+    Write-Output "Website output: $dist"
+    if ($Serve -or $Browser) {
+        $listener = Get-NetTCPConnection -LocalAddress 127.0.0.1 -LocalPort 8796 -State Listen -ErrorAction SilentlyContinue
+        if (-not $listener) {
+            $server = Start-Process -FilePath 'python' -ArgumentList @('-m','http.server','8796','--bind','127.0.0.1','--directory',$dist) -WindowStyle Hidden -PassThru -RedirectStandardOutput "$BuildRoot/server.log" -RedirectStandardError "$BuildRoot/server-errors.log"
+            $server.Id | Set-Content -LiteralPath "$BuildRoot/server.pid"
+        }
+        $ready = $false
+        for ($attempt = 0; $attempt -lt 30; $attempt++) {
+            try {
+                $client = New-Object System.Net.WebClient
+                $response = $client.DownloadString('http://127.0.0.1:8796/')
+                $client.Dispose()
+                if ($response -notlike '*name="glory-render" content="ssr"*') { throw 'port 8796 belongs to another service' }
+                $ready = $true
+                break
+            } catch { Start-Sleep -Milliseconds 100 }
+        }
+        if (-not $ready) { throw 'website server did not become ready on 8796' }
+        Write-Output 'Website URL: http://127.0.0.1:8796/'
+    }
+    if ($Browser) {
+        $env:GLORY_WEBSITE_BASE = 'http://127.0.0.1:8796'
+        & node tests/browser.cjs
+        if ($LASTEXITCODE -ne 0) { throw 'website browser acceptance failed' }
+    }
+} finally {
+    Pop-Location
+    foreach ($name in $environmentNames) { [Environment]::SetEnvironmentVariable($name, $savedEnvironment[$name], 'Process') }
+}
