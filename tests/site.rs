@@ -150,7 +150,7 @@ fn chinese_pages_render_translated_content_links_and_metadata() {
         assert!(document.contains("<html lang=\"zh-CN\">"));
         assert!(document.contains(&format!("<title>{}</title>", metadata::escape(&route.title()))));
         assert!(document.contains(&format!(
-            "rel=\"canonical\" href=\"https://glory.taidge.com{}\"",
+            "rel=\"canonical\" href=\"https://glory.taidge.org{}\"",
             route.path()
         )));
         if page == Route::NotFound {

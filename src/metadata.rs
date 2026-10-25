@@ -1,6 +1,6 @@
 use crate::{Locale, Route, SiteRoute};
 
-pub const ORIGIN: &str = "https://glory.taidge.com";
+pub const ORIGIN: &str = "https://glory.taidge.org";
 
 pub fn escape(value: &str) -> String {
     value

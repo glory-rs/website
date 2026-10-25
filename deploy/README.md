@@ -2,7 +2,7 @@
 
 Pushes to `main` build and deploy through `.github/workflows/deploy.yml`.
 The workflow can also be run from GitHub Actions with **Run workflow** on `main`.
-The production website is <https://glory.taidge.com/>.
+The production website is <https://glory.taidge.org/>.
 
 ## One-time account setup
 
@@ -20,28 +20,31 @@ Never commit credentials. The workflow exposes the token only to its deployment 
 The first deployment creates a **Direct Upload** Pages project if it does not
 exist, with `main` as the production branch. An existing project must use `main`
 as its production branch. Every successful deployment updates the project's
-custom domain, `glory.taidge.com`.
+custom domain, `glory.taidge.org`.
 
-`glory.taidge.com` is attached in **Workers & Pages → glory-website → Custom
-domains**, with a `glory` CNAME in the Cloudflare-managed `taidge.com` zone
+`glory.taidge.org` is attached in **Workers & Pages → glory-website → Custom
+domains**, with a `glory` CNAME in the Cloudflare-managed `taidge.org` zone
 pointing to `glory-website-3fn.pages.dev`. Generated asset/navigation URLs remain
 root-relative.
 
-## Redirect the default Pages address
+## Redirect the previous domain and default Pages address
 
 The account-level Bulk Redirect List `glory_pages_to_custom_domain` redirects
-`glory-website-3fn.pages.dev` to `https://glory.taidge.com/` with status **301**.
+`glory-website-3fn.pages.dev` and the previous `glory.taidge.com` domain directly
+to `https://glory.taidge.org/` with status **301**.
 Its rule is named `Glory Pages to official domain`.
 
 The importable list is recorded in [pages-dev-redirects.csv](pages-dev-redirects.csv).
 It has no header row; columns are source URL, target URL, status code, preserve
 query string, include subdomains, subpath matching, and preserve path suffix.
-All four boolean options are enabled, so paths, query strings, and Pages preview
-subdomains redirect to the corresponding official URL. For example:
+Paths and query strings are preserved for both sources. Subdomain matching is
+enabled only for the Pages source so preview subdomains also redirect. For example:
 
 ```text
 https://glory-website-3fn.pages.dev/docs/web/?from=old
-→ https://glory.taidge.com/docs/web/?from=old
+→ https://glory.taidge.org/docs/web/?from=old
+https://glory.taidge.com/zh/docs/i18n/?from=old
+→ https://glory.taidge.org/zh/docs/i18n/?from=old
 ```
 
 Manage the list and its enabled rule in the Cloudflare account's **Bulk
@@ -49,6 +52,10 @@ Redirects** dashboard. This is account-level configuration, independent of site
 deployments. The CSV is a recovery/import reference, not an asset copied into
 `dist`; GitHub Actions does not apply account-level redirect rules. The existing
 Pages-only deployment token does not need broader permissions.
+
+Keep the previous domain attached to Pages and its DNS record in the
+Cloudflare-managed `taidge.com` zone so HTTPS requests reach the redirect rule.
+Activate and verify `glory.taidge.org` before enabling the old-domain redirect.
 
 Pages `_redirects` does not support domain-level redirects. Do not add a blanket
 `/*` redirect there: it would also redirect requests on the official domain.

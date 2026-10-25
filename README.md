@@ -24,7 +24,7 @@ The current checkout uses sibling path dependencies on `../glory` and `../sapid`
 ## Languages
 
 English uses the paths above. Simplified Chinese uses `/zh/` and the same chapter
-paths, for example <https://glory.taidge.com/zh/docs/>. Both versions are generated
+paths, for example <https://glory.taidge.org/zh/docs/>. Both versions are generated
 as complete static HTML and hydrate from the URL's language. The header language
 link preserves the chapter, query string and fragment. Browser preferences never
 override an explicit URL.
@@ -51,7 +51,7 @@ the language menu and demo in both guide routes. Example resources live in
 ## Automatic deployment
 
 Pushes to `main` build and publish the production site at
-<https://glory.taidge.com/> through GitHub Actions and Cloudflare Pages.
+<https://glory.taidge.org/> through GitHub Actions and Cloudflare Pages.
 The workflow checks out the dependency revisions pinned in
 `deploy/dependencies.json`, runs native tests, and generates release HTML/WASM.
 See [deployment setup and troubleshooting](deploy/README.md).
