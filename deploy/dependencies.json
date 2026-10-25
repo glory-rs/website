@@ -1,0 +1,10 @@
+{
+  "glory": {
+    "repository": "glory-rs/glory",
+    "revision": "b660dea9fc182270d2eb13bbf00a08b4dab1a49b"
+  },
+  "sapid": {
+    "repository": "sapid-ui/sapid",
+    "revision": "fd64d78edf9f91f9dc63bfa2be6e59ec1f739a58"
+  }
+}

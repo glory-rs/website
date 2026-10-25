@@ -1,0 +1,135 @@
+name: Deploy website to Cloudflare Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cloudflare-pages-production
+  cancel-in-progress: false
+
+env:
+  BUILD_ROOT: D:/BuildCache/glory-website
+  CARGO_HOME: D:/BuildCache/glory-website/cargo
+  CARGO_TARGET_DIR: D:/BuildCache/glory-website/target
+  RUSTUP_HOME: D:/BuildCache/glory-website/rustup
+  CARGO_INCREMENTAL: '0'
+  CARGO_BUILD_JOBS: '2'
+  TEMP: D:/BuildCache/glory-website/tmp
+  TMP: D:/BuildCache/glory-website/tmp
+  npm_config_cache: D:/BuildCache/glory-website/npm
+  WRANGLER_SEND_METRICS: 'false'
+  RUST_VERSION: 1.98.0
+  WASM_BINDGEN_VERSION: 0.2.129
+
+jobs:
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    runs-on: windows-latest
+    timeout-minutes: 45
+    defaults:
+      run:
+        shell: pwsh
+        working-directory: website
+    steps:
+      - name: Check out website
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          path: website
+          persist-credentials: false
+
+      - name: Read pinned sibling dependencies
+        id: dependencies
+        run: |
+          $dependencies = Get-Content deploy/dependencies.json -Raw | ConvertFrom-Json
+          foreach ($name in @('glory','sapid')) {
+            if ($dependencies.$name.revision -notmatch '^[a-f0-9]{40}$') { throw "Invalid revision for $name" }
+            "$($name)_repository=$($dependencies.$name.repository)" >> $env:GITHUB_OUTPUT
+            "$($name)_revision=$($dependencies.$name.revision)" >> $env:GITHUB_OUTPUT
+          }
+
+      - name: Check out Glory
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          repository: ${{ steps.dependencies.outputs.glory_repository }}
+          ref: ${{ steps.dependencies.outputs.glory_revision }}
+          path: glory
+          persist-credentials: false
+
+      - name: Check out Sapid
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          repository: ${{ steps.dependencies.outputs.sapid_repository }}
+          ref: ${{ steps.dependencies.outputs.sapid_revision }}
+          path: sapid
+          persist-credentials: false
+
+      - name: Prepare D drive build directories
+        run: |
+          if (-not (Test-Path D:/)) { throw 'This build requires a D drive' }
+          New-Item -ItemType Directory -Force -Path $env:BUILD_ROOT,$env:TEMP,$env:CARGO_HOME,$env:RUSTUP_HOME | Out-Null
+          "$env:CARGO_HOME/bin" >> $env:GITHUB_PATH
+
+      - name: Cache Rust tools and build outputs on D drive
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        with:
+          path: |
+            D:/BuildCache/glory-website/cargo
+            D:/BuildCache/glory-website/rustup
+            D:/BuildCache/glory-website/target
+            D:/BuildCache/glory-website/tools
+          key: website-${{ runner.os }}-${{ runner.arch }}-${{ env.RUST_VERSION }}-${{ env.WASM_BINDGEN_VERSION }}-${{ hashFiles('website/Cargo.lock', 'website/deploy/dependencies.json') }}
+
+      - name: Install Rust
+        run: |
+          rustup toolchain install $env:RUST_VERSION --profile minimal --target wasm32-unknown-unknown
+          if ($LASTEXITCODE -ne 0) { throw 'Rust installation failed' }
+          rustup default $env:RUST_VERSION
+          if ($LASTEXITCODE -ne 0) { throw 'Rust selection failed' }
+
+      - name: Verify Cargo output directory and run native tests
+        run: |
+          $metadata = cargo metadata --locked --no-deps --format-version 1 | ConvertFrom-Json
+          if ($LASTEXITCODE -ne 0) { throw 'Cargo metadata failed' }
+          if ([IO.Path]::GetFullPath($metadata.target_directory) -ne [IO.Path]::GetFullPath($env:CARGO_TARGET_DIR)) { throw 'Cargo target must be on D drive' }
+          cargo test --locked --all-targets
+          if ($LASTEXITCODE -ne 0) { throw 'Native tests failed' }
+
+      - name: Install wasm-bindgen
+        run: |
+          $tools = "$env:BUILD_ROOT/tools"
+          $package = "wasm-bindgen-$env:WASM_BINDGEN_VERSION-x86_64-pc-windows-msvc"
+          if (-not (Test-Path "$tools/$package/wasm-bindgen.exe")) {
+            New-Item -ItemType Directory -Force -Path $tools | Out-Null
+            Invoke-WebRequest "https://github.com/wasm-bindgen/wasm-bindgen/releases/download/$env:WASM_BINDGEN_VERSION/$package.tar.gz" -OutFile "$tools/$package.tar.gz"
+            tar -xzf "$tools/$package.tar.gz" -C $tools
+            if ($LASTEXITCODE -ne 0) { throw 'wasm-bindgen extraction failed' }
+          }
+          "$tools/$package" >> $env:GITHUB_PATH
+
+      - name: Build production HTML and WASM
+        run: ./scripts/build.ps1 -Release -BuildRoot $env:BUILD_ROOT
+
+      - name: Save static site artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: website-dist
+          path: D:/BuildCache/glory-website/dist
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Set up Node.js for Wrangler
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '22'
+
+      - name: Deploy to Cloudflare Pages
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          PAGES_PROJECT_NAME: ${{ vars.CLOUDFLARE_PAGES_PROJECT_NAME || 'glory-website' }}
+        run: ./scripts/deploy.ps1 -Directory "$env:BUILD_ROOT/dist" -ProjectName $env:PAGES_PROJECT_NAME
