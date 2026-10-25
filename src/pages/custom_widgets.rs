@@ -195,6 +195,9 @@ pub fn custom_widgets(locale: Locale) -> impl Widget {
             copy("docs-callout-title", locale.text("custom-widgets-a-mount-checklist")),
             copy("", locale.text("custom-widgets-allocate-state-from-the-build-scope-finish-the-root")),
         ))),
+        Box::new(heading(2, "docs-heading", locale.text("custom-widgets-sapid-heading"))),
+        Box::new(copy("docs-paragraph", locale.text("custom-widgets-sapid-description"))),
+        Box::new(external(locale.text("navigation-explore-sapid"), crate::navigation::SAPID_URL, "text-link")),
         Box::new(doc_nav(locale, Some(Route::Widgets), Some(Route::Styling))),
     ];
     docs_layout(locale, Route::CustomWidgets, view().fill(content))

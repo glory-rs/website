@@ -41,12 +41,87 @@ const plain = text => text.replace(/[\u2068\u2069]/g, '');
     await primary.getByRole('link', { name: 'Docs', exact: true }).click();
     await page.waitForURL('**/docs/');
     await page.getByRole('heading', { name: 'Learn Glory from first principles.' }).waitFor();
-    await primary.getByRole('link', { name: 'Architecture', exact: true }).click();
+    await page.locator('.docs-sidebar').getByRole('link', { name: 'Architecture', exact: true }).click();
     await page.waitForURL('**/docs/architecture/');
     await page.getByRole('heading', { level: 1 }).waitFor();
     await page.goBack();
     await page.getByRole('heading', { name: 'Learn Glory from first principles.' }).waitFor();
     check('History routing and back navigation');
+
+    await page.setViewportSize({ width: 1440, height: 1000 });
+    for (const prefix of ['', '/zh']) {
+      await page.goto(`${base}${prefix}/docs/widgets/`);
+      await page.waitForFunction(() => window.gloryReady === true);
+      await page.evaluate(() => { window.navigationDocument = true; });
+      const globalNav = page.locator('.desktop-nav');
+      assert.equal(await globalNav.getByRole('link').count(), 3);
+      assert.equal(await globalNav.getByRole('link', { name: 'Sapid ↗', exact: true }).getAttribute('href'), 'https://sapid.taidge.org/');
+      assert.equal(await globalNav.locator('a[href="https://github.com/glory-rs/glory/tree/f710ea096b8cab932e876093f34e90e259197141/crates"]').count(), 1);
+      const chapters = await page.locator(`.docs-sidebar a[href^="${prefix}/docs/"]`).evaluateAll(links => links.map(link => link.getAttribute('href')));
+      assert.equal(chapters.length, 10);
+      for (const href of chapters) {
+        await page.locator(`.docs-sidebar a[href="${href}"]`).click();
+        await page.waitForURL(`${base}${href}`);
+        await page.waitForFunction(href => document.querySelector('.docs-sidebar [aria-current="page"]')?.getAttribute('href') === href, href);
+        assert.equal(await page.evaluate(() => window.navigationDocument), true, 'chapter changes use the same document');
+        assert.equal(await globalNav.locator('.is-active').count(), 1);
+        const globalCurrent = globalNav.locator('.is-active');
+        assert.equal(await globalCurrent.getAttribute('href'), `${prefix}/docs/`);
+        assert.equal(await globalCurrent.getAttribute('aria-current'), href === `${prefix}/docs/` ? 'page' : 'location');
+        assert.equal(await page.locator('.docs-sidebar .is-active').count(), 1);
+        assert.equal(await page.locator('.docs-sidebar [aria-current="page"]').getAttribute('href'), href);
+      }
+      await page.locator(`.docs-sidebar a[href="${prefix}/docs/styling/"]`).click();
+      await page.waitForURL(`${base}${prefix}/docs/styling/`);
+      await page.waitForFunction(href => document.querySelector('.docs-sidebar [aria-current="page"]')?.getAttribute('href') === href, `${prefix}/docs/styling/`);
+      await page.locator(`.docs-sidebar a[href="${prefix}/docs/"]`).hover();
+      assert.notEqual(
+        await page.locator(`.docs-sidebar a[href="${prefix}/docs/"]`).evaluate(e => getComputedStyle(e).backgroundColor),
+        await page.locator('.docs-sidebar .is-active').evaluate(e => getComputedStyle(e).backgroundColor),
+        'hover and current chapter have distinct backgrounds',
+      );
+      await page.locator(`.docs-sidebar a[href="${prefix}/docs/ssr/"]`).click();
+      await page.waitForURL(`${base}${prefix}/docs/ssr/`);
+      await page.goBack();
+      await page.waitForURL(`${base}${prefix}/docs/styling/`);
+      await page.waitForFunction(href => document.querySelector('.docs-sidebar [aria-current="page"]')?.getAttribute('href') === href, `${prefix}/docs/styling/`);
+      assert.equal(await page.locator('.docs-sidebar [aria-current="page"]').getAttribute('href'), `${prefix}/docs/styling/`);
+      assert.equal(await globalNav.locator('.is-active').getAttribute('href'), `${prefix}/docs/`);
+    }
+    check('Both languages: Docs stays current across all sidebar chapters and Back; hover differs from selection; API and Sapid stay external');
+
+    await page.goto(`${base}/docs/ssr/`);
+    await page.waitForFunction(() => window.gloryReady === true);
+    await page.evaluate(() => window.scrollTo(0, 1000));
+    await page.waitForFunction(() => scrollY >= 900);
+    const pinnedNavigation = await page.evaluate(() => ({
+      header: document.querySelector('.site-header').getBoundingClientRect().toJSON(),
+      sidebar: document.querySelector('.docs-sidebar').getBoundingClientRect().toJSON(),
+      height: innerHeight,
+    }));
+    assert.equal(pinnedNavigation.header.top, 0);
+    assert.ok(pinnedNavigation.sidebar.top >= pinnedNavigation.header.bottom && pinnedNavigation.sidebar.top <= pinnedNavigation.header.bottom + 8, JSON.stringify(pinnedNavigation));
+    assert.ok(pinnedNavigation.sidebar.bottom <= pinnedNavigation.height, JSON.stringify(pinnedNavigation));
+    check('Long documentation pages retain the global header and a scrollable sidebar below it');
+
+    for (const prefix of ['', '/zh']) {
+      await page.setViewportSize({ width: 390, height: 800 });
+      await page.goto(`${base}${prefix}/docs/widgets/`);
+      await page.waitForFunction(() => window.gloryReady === true);
+      await page.locator('.menu-button').click();
+      const mobileSection = page.locator('.mobile-nav');
+      await mobileSection.waitFor();
+      assert.equal(await mobileSection.locator('.is-active').count(), 1);
+      assert.equal(await mobileSection.locator('[aria-current="location"]').getAttribute('href'), `${prefix}/docs/`);
+      assert.equal(await mobileSection.getByRole('link', { name: 'Sapid ↗', exact: true }).getAttribute('href'), 'https://sapid.taidge.org/');
+      await page.screenshot({ path: `D:/BuildCache/glory-website/navigation-mobile-${prefix ? 'zh' : 'en'}.png` });
+      await mobileSection.locator(`a[href="${prefix}/docs/"]`).click();
+      await page.waitForURL(`${base}${prefix}/docs/`);
+      await page.locator('.mobile-nav').waitFor({ state: 'hidden' });
+    }
+    check('Both mobile menus preserve the Docs section, include Sapid and close after changing chapter');
+
+    await page.setViewportSize({ width: 1280, height: 900 });
 
     await page.goto(`${base}/`);
     await page.waitForFunction(() => window.gloryReady === true);
@@ -61,8 +136,15 @@ const plain = text => text.replace(/[\u2068\u2069]/g, '');
     await staticPage.goto(`${base}/`);
     await staticPage.getByRole('heading', { name: 'One language. Every interface.' }).waitFor();
     await staticPage.locator('.counter-label').filter({ hasText: /Clicks:/ }).first().waitFor();
+    for (const [prefix, heading] of [['', 'Build applications with Sapid'], ['/zh', '使用 Sapid 构建应用界面']]) {
+      await staticPage.goto(`${base}${prefix}/docs/widgets/`);
+      await staticPage.getByRole('heading', { name: heading, exact: true }).waitFor();
+      assert.equal(await staticPage.locator('.desktop-nav [aria-current="location"]').getAttribute('href'), `${prefix}/docs/`);
+      assert.equal(await staticPage.locator('.docs-sidebar [aria-current="page"]').getAttribute('href'), `${prefix}/docs/widgets/`);
+      assert.equal(await staticPage.locator('.docs-article a[href="https://sapid.taidge.org/"]').count(), 1);
+    }
     await staticContext.close();
-    check('SSR content works without JavaScript');
+    check('No-JS SSR includes both levels of current navigation and bilingual Sapid documentation');
 
     for (const width of [1280, 768, 390, 320]) {
       await page.setViewportSize({ width, height: 800 });
@@ -91,7 +173,8 @@ const plain = text => text.replace(/[\u2068\u2069]/g, '');
     await page.getByRole('button', { name: 'Toggle navigation' }).click();
     const mobile = page.getByRole('navigation', { name: 'Mobile navigation' });
     await mobile.waitFor();
-    await mobile.getByRole('link', { name: 'Get started', exact: true }).click();
+    assert.equal(await mobile.getByRole('link', { name: 'Sapid ↗', exact: true }).getAttribute('href'), 'https://sapid.taidge.org/');
+    await mobile.getByRole('link', { name: 'Docs', exact: true }).click();
     await page.waitForURL('**/docs/');
     await page.getByRole('heading', { name: 'Learn Glory from first principles.' }).waitFor();
     check('Mobile navigation opens and routes');
@@ -155,7 +238,7 @@ const plain = text => text.replace(/[\u2068\u2069]/g, '');
     await page.waitForFunction(() => navigator.clipboard.readText().then(text => text.includes('scope.cage')));
     await page.setViewportSize({ width: 390, height: 800 });
     await page.getByRole('button', { name: '切换导航', exact: true }).click();
-    await page.getByRole('navigation', { name: '移动端导航' }).getByRole('link', { name: '开始使用', exact: true }).click();
+    await page.getByRole('navigation', { name: '移动端导航' }).getByRole('link', { name: '文档', exact: true }).click();
     await page.waitForURL('**/zh/docs/');
     await page.getByRole('heading', { name: '从基本原理学习 Glory。' }).waitFor();
     check('Chinese counter, copy and mobile navigation work after hydration');
@@ -249,6 +332,15 @@ const plain = text => text.replace(/[\u2068\u2069]/g, '');
     await zhPicker.click();
     await page.getByRole('menu', { name: '简体中文', exact: true }).waitFor();
     await page.screenshot({ path: 'D:/BuildCache/glory-website/zh-i18n-guide.png', fullPage: false });
+
+    await page.goto(`${base}/docs/widgets/`);
+    await page.waitForFunction(() => window.gloryReady === true);
+    await page.locator('.docs-sidebar a[href="/docs/"]').hover();
+    await page.screenshot({ path: 'D:/BuildCache/glory-website/navigation-widgets.png', fullPage: false });
+    await page.goto(`${base}/zh/docs/`);
+    await page.waitForFunction(() => window.gloryReady === true);
+    await page.locator('.docs-map').scrollIntoViewIfNeeded();
+    await page.screenshot({ path: 'D:/BuildCache/glory-website/navigation-overview.png', fullPage: false });
 
     assert.deepEqual(report.errors, [], 'Browser console and hydration errors');
     check('No browser console or hydration errors');

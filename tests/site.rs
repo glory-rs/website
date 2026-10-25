@@ -1,4 +1,4 @@
-use glory::render::{Event, NodeId, Props};
+use glory::render::{Current, Event, NodeId, Props};
 use glory::ui::App;
 use glory_website::{Locale, Route, SiteRoute, app, i18n, metadata};
 
@@ -32,13 +32,14 @@ fn every_route_has_complete_ssr_content_and_navigation() {
         assert!(html.contains("glory-site"), "{route:?}");
         assert!(html.contains("Primary navigation"), "{route:?}");
         assert!(html.contains("href=\"/docs/\""), "{route:?}");
-        assert!(html.contains("href=\"/docs/widgets/\""), "{route:?}");
         if !matches!(route, Route::Home | Route::NotFound) {
-            assert!(html.contains("START HERE"), "{route:?}");
-            assert!(html.contains("CORE CONCEPTS"), "{route:?}");
-            assert!(html.contains("RENDERING &amp; PLATFORMS"), "{route:?}");
+            assert!(html.contains("href=\"/docs/widgets/\""), "{route:?}");
+            assert!(html.contains("Start here"), "{route:?}");
+            assert!(html.contains("Core concepts"), "{route:?}");
+            assert!(html.contains("Building interfaces"), "{route:?}");
             assert!(html.contains("Tutorial pagination"), "{route:?}");
         }
+        assert!(html.contains("href=\"https://sapid.taidge.org/\""), "{route:?}");
         assert!(!html.contains("<iframe"), "{route:?}");
         match route {
             Route::Home => assert!(html.contains("One language.")),
@@ -140,9 +141,9 @@ fn chinese_pages_render_translated_content_links_and_metadata() {
         let html = glory::ssr::snapshot(app(route)).unwrap().html;
         assert!(html.contains("主导航"), "{page:?}");
         assert!(html.contains("href=\"/zh/docs/\""), "{page:?}");
-        assert!(html.contains("href=\"/zh/docs/widgets/\""), "{page:?}");
         assert!(html.contains("language-picker"));
         if !matches!(page, Route::Home | Route::NotFound) {
+            assert!(html.contains("href=\"/zh/docs/widgets/\""), "{page:?}");
             assert!(html.contains("核心概念"));
             assert!(html.contains("教程翻页导航"));
         }
@@ -202,5 +203,57 @@ fn mobile_navigation_is_controlled_by_rust_state() {
     assert_eq!(mobile_links(), 0);
     app.dispatch(toggle, Event::Activate).unwrap();
     app.flush().unwrap();
-    assert_eq!(mobile_links(), 6);
+    assert_eq!(mobile_links(), 4);
+}
+
+#[test]
+fn documentation_section_stays_current_for_every_chapter_in_both_languages() {
+    for locale in Locale::ALL {
+        for route in Route::ALL.into_iter().chain([Route::NotFound]) {
+            let app = App::memory();
+            app.mount(glory_website::components::header(locale, route)).unwrap();
+            let active: Vec<_> = nodes(&app)
+                .into_iter()
+                .filter(|id| {
+                    app.tree()
+                        .node(*id)
+                        .unwrap()
+                        .descriptor
+                        .view()
+                        .classes
+                        .iter()
+                        .any(|c| c == "is-active")
+                })
+                .collect();
+            if matches!(route, Route::Home | Route::NotFound) {
+                assert!(active.is_empty(), "{locale:?} {route:?}");
+            } else {
+                assert_eq!(active.len(), 1, "{locale:?} {route:?}");
+                let tree = app.tree();
+                let view = tree.node(active[0]).unwrap().descriptor.view();
+                let Props::Link(link) = view.props else { panic!("navigation must be a link") };
+                assert_eq!(link.label, locale.text("common-docs"));
+                assert_eq!(link.target, SiteRoute::new(locale, Route::Docs).path());
+                assert_eq!(
+                    view.semantics.as_ref().unwrap().current,
+                    Some(if route == Route::Docs { Current::Page } else { Current::Location })
+                );
+            }
+        }
+    }
+}
+
+#[test]
+fn documentation_groups_cover_all_chapters_once_and_sapid_example_renders() {
+    let chapters: Vec<_> = glory_website::navigation::DOC_GROUPS
+        .iter()
+        .flat_map(|group| group.chapters.iter().map(|chapter| chapter.route))
+        .collect();
+    assert_eq!(chapters.len(), Route::ALL.len() - 1);
+    for route in Route::ALL.into_iter().filter(|route| *route != Route::Home) {
+        assert_eq!(chapters.iter().filter(|chapter| **chapter == route).count(), 1);
+    }
+    let html =
+        glory::ssr::snapshot(glory_website::examples::sapid_action::save_action()).unwrap().html;
+    assert!(html.contains("Save changes"));
 }

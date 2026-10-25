@@ -1,5 +1,5 @@
 use crate::Locale;
-use crate::{Route, components::*};
+use crate::{Route, components::link, components::*};
 use glory::prelude::*;
 use sapid::Theme;
 
@@ -160,6 +160,29 @@ pub fn widgets(locale: Locale) -> impl Widget {
             copy(
                 "",
                 locale.text("widgets-glory-provides-view-group-text-button-input-check-image"),
+            ),
+        ))),
+        Box::new(heading(2, "docs-heading", locale.text("widgets-sapid-heading"))),
+        Box::new(copy("docs-paragraph", locale.text("widgets-sapid-description"))),
+        Box::new(code_panel(
+            locale,
+            Theme::blue_dark(),
+            "save_action.rs",
+            include_str!("../examples/sapid_action.rs"),
+            "docs-code",
+        )),
+        Box::new(copy("docs-paragraph", locale.text("widgets-sapid-setup"))),
+        Box::new(view().class("docs-actions").fill((
+            external(
+                locale.text("navigation-explore-sapid"),
+                crate::navigation::SAPID_URL,
+                "text-link",
+            ),
+            link(
+                locale,
+                locale.text("widgets-sapid-custom-link"),
+                Route::CustomWidgets,
+                "text-link",
             ),
         ))),
         Box::new(heading(2, "docs-heading", locale.text("widgets-import-the-builders"))),

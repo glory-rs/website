@@ -21,6 +21,26 @@ The content focuses on Glory itself: its design principles, built-in semantic wi
 
 The current checkout uses sibling path dependencies on `../glory` and `../sapid`.
 
+## Documentation navigation
+
+The global menu contains Docs, API source, and the [Sapid component
+library](https://sapid.taidge.org/). Docs stays current throughout `/docs/` and
+`/zh/docs/`; the sidebar alone identifies the current chapter. Ancestor links
+use `aria-current="location"`, while an exact page uses `aria-current="page"`.
+Hover has its own appearance. Desktop and mobile share the same global links.
+Long documentation pages keep the header and desktop chapter navigation visible;
+the sidebar scrolls within the remaining viewport height.
+
+The API source link and installation example use the pinned Glory revision in
+`deploy/dependencies.json`. Keep them aligned when adopting another revision;
+the old docs.rs 0.3.1 release documents the previous architecture.
+
+`src/navigation.rs` supplies the sidebar and the documentation overview with one
+reading order: Start here, Core concepts, Building interfaces, Application
+guides, and Reference. Existing chapter URLs and previous/next links remain
+valid. The widgets, custom widgets, and styling guides explain where Sapid fits;
+the displayed `save_action.rs` example is also compiled as part of the site.
+
 ## Languages
 
 English uses the paths above. Simplified Chinese uses `/zh/` and the same chapter

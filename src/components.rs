@@ -1,4 +1,5 @@
 use crate::Locale;
+use crate::navigation::{self, API_URL, SAPID_URL};
 use crate::{Route, app::request_navigation};
 use glory::prelude::*;
 use glory::render::{Current, Role};
@@ -78,10 +79,28 @@ fn nav_link(
     link(locale, label, route, &class).current(if active { Some(Current::Page) } else { None })
 }
 
+fn primary_links(locale: Locale, current: Route, mobile: bool) -> Vec<Box<dyn Widget>> {
+    let in_docs = navigation::is_documentation(current);
+    let section = if in_docs { Route::Docs } else { current };
+    let docs = nav_link(locale, locale.text("common-docs"), Route::Docs, section, mobile).current(
+        if !in_docs {
+            None
+        } else if current == Route::Docs {
+            Some(Current::Page)
+        } else {
+            Some(Current::Location)
+        },
+    );
+    let class = if mobile { "mobile-nav-link" } else { "nav-link" };
+    vec![
+        Box::new(docs),
+        Box::new(external(locale.text("navigation-api"), API_URL, class)),
+        Box::new(external("Sapid ↗", SAPID_URL, class)),
+    ]
+}
+
 pub fn header(locale: Locale, current: Route) -> impl Widget {
     widget(move |scope| {
-        let docs_current =
-            if matches!(current, Route::Reactivity | Route::I18n) { Route::Docs } else { current };
         let open = scope.cage(false);
         let menu_label =
             open.map(
@@ -102,37 +121,7 @@ pub fn header(locale: Locale, current: Route) -> impl Widget {
                         .role(Role::Navigation)
                         .name(locale.text("common-primary-navigation"))
                         .class("desktop-nav")
-                        .fill((
-                            nav_link(
-                                locale,
-                                locale.text("common-docs"),
-                                Route::Docs,
-                                docs_current,
-                                false,
-                            ),
-                            nav_link(
-                                locale,
-                                locale.text("common-architecture"),
-                                Route::Architecture,
-                                current,
-                                false,
-                            ),
-                            nav_link(
-                                locale,
-                                locale.text("common-widgets"),
-                                Route::Widgets,
-                                current,
-                                false,
-                            ),
-                            nav_link(locale, locale.text("common-ssr"), Route::Ssr, current, false),
-                            nav_link(
-                                locale,
-                                locale.text("common-platforms"),
-                                Route::Platforms,
-                                current,
-                                false,
-                            ),
-                        )),
+                        .fill(primary_links(locale, current, false)),
                     view().class("header-actions").fill((
                         copy("version", "v0.3.1"),
                         external("GitHub", "https://github.com/glory-rs/glory", "github-link"),
@@ -150,48 +139,15 @@ pub fn header(locale: Locale, current: Route) -> impl Widget {
                         .role(Role::Navigation)
                         .name(locale.text("common-mobile-navigation"))
                         .class("mobile-nav")
-                        .fill((
-                            nav_link(
-                                locale,
-                                locale.text("common-get-started"),
-                                Route::Docs,
-                                current,
-                                true,
-                            ),
-                            nav_link(
-                                locale,
-                                locale.text("common-architecture"),
-                                Route::Architecture,
-                                current,
-                                true,
-                            ),
-                            nav_link(
-                                locale,
-                                locale.text("common-built-in-widgets"),
-                                Route::Widgets,
-                                current,
-                                true,
-                            ),
-                            nav_link(
-                                locale,
-                                locale.text("common-ssr-hydration"),
-                                Route::Ssr,
-                                current,
-                                true,
-                            ),
-                            nav_link(
-                                locale,
-                                locale.text("common-platforms"),
-                                Route::Platforms,
-                                current,
-                                true,
-                            ),
-                            external(
+                        .fill({
+                            let mut links = primary_links(locale, current, true);
+                            links.push(Box::new(external(
                                 locale.text("common-github-repository"),
                                 "https://github.com/glory-rs/glory",
                                 "mobile-nav-link",
-                            ),
-                        ))
+                            )));
+                            links
+                        })
                 }),
             ))
             .show_in(scope)
@@ -302,62 +258,25 @@ pub fn doc_nav(locale: Locale, previous: Option<Route>, next: Option<Route>) -> 
 }
 
 pub fn docs_layout(locale: Locale, current: Route, content: impl Widget) -> impl Widget {
-    let navigation: Vec<Box<dyn Widget>> = vec![
-        Box::new(copy("docs-sidebar-title", locale.text("common-start-here"))),
-        Box::new(nav_link(
-            locale,
-            locale.text("common-getting-started"),
-            Route::Docs,
-            current,
-            false,
-        )),
-        Box::new(nav_link(
-            locale,
-            locale.text("common-architecture"),
-            Route::Architecture,
-            current,
-            false,
-        )),
-        Box::new(copy("docs-sidebar-title", locale.text("common-core-concepts"))),
-        Box::new(nav_link(
-            locale,
-            locale.text("common-reactivity"),
-            Route::Reactivity,
-            current,
-            false,
-        )),
-        Box::new(nav_link(
-            locale,
-            locale.text("common-built-in-widgets"),
-            Route::Widgets,
-            current,
-            false,
-        )),
-        Box::new(nav_link(
-            locale,
-            locale.text("common-custom-widgets"),
-            Route::CustomWidgets,
-            current,
-            false,
-        )),
-        Box::new(nav_link(locale, locale.text("common-styling"), Route::Styling, current, false)),
-        Box::new(nav_link(locale, locale.text("i18n-nav"), Route::I18n, current, false)),
-        Box::new(copy("docs-sidebar-title", locale.text("common-rendering-platforms"))),
-        Box::new(nav_link(locale, locale.text("common-web"), Route::Web, current, false)),
-        Box::new(nav_link(locale, locale.text("common-ssr-hydration"), Route::Ssr, current, false)),
-        Box::new(nav_link(
-            locale,
-            locale.text("common-platforms"),
-            Route::Platforms,
-            current,
-            false,
-        )),
-        Box::new(external(
-            locale.text("common-api-on-docs-rs"),
-            "https://docs.rs/glory",
-            "docs-external-link",
-        )),
-    ];
+    let mut navigation: Vec<Box<dyn Widget>> = Vec::new();
+    for group in navigation::DOC_GROUPS {
+        navigation.push(Box::new(copy("docs-sidebar-title", locale.text(group.title))));
+        for chapter in group.chapters {
+            navigation.push(Box::new(nav_link(
+                locale,
+                locale.text(chapter.label),
+                chapter.route,
+                current,
+                false,
+            )));
+        }
+    }
+    navigation.push(Box::new(external(locale.text("navigation-api"), API_URL, "nav-link")));
+    navigation.push(Box::new(external(
+        locale.text("navigation-sapid-library"),
+        SAPID_URL,
+        "nav-link",
+    )));
     view().role(Role::Main).class("docs-page").fill((
         view()
             .role(Role::Navigation)
@@ -366,4 +285,26 @@ pub fn docs_layout(locale: Locale, current: Route, content: impl Widget) -> impl
             .fill(navigation),
         view().class("docs-article").fill(content),
     ))
+}
+
+pub fn documentation_map(locale: Locale) -> impl Widget {
+    let cards: Vec<Box<dyn Widget>> = navigation::DOC_GROUPS
+        .iter()
+        .map(|group| {
+            let chapters: Vec<Box<dyn Widget>> = group
+                .chapters
+                .iter()
+                .map(|chapter| {
+                    Box::new(link(locale, locale.text(chapter.label), chapter.route, "text-link"))
+                        as Box<dyn Widget>
+                })
+                .collect();
+            Box::new(view().class("docs-map-card").fill((
+                heading(3, "docs-card-title", locale.text(group.title)),
+                copy("docs-paragraph", locale.text(group.description)),
+                view().class("docs-map-links").fill(chapters),
+            ))) as Box<dyn Widget>
+        })
+        .collect();
+    view().class("docs-map").fill(cards)
 }

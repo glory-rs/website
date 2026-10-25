@@ -202,6 +202,13 @@ pub fn styling(locale: Locale) -> impl Widget {
             ),
             copy("", locale.text("styling-a-declaration-accepted-by-two-hosts-can-still-resolve")),
         ))),
+        Box::new(heading(2, "docs-heading", locale.text("styling-sapid-heading"))),
+        Box::new(copy("docs-paragraph", locale.text("styling-sapid-description"))),
+        Box::new(external(
+            locale.text("styling-sapid-link"),
+            crate::navigation::SAPID_URL,
+            "text-link",
+        )),
         Box::new(doc_nav(locale, Some(Route::CustomWidgets), Some(Route::I18n))),
     ];
     docs_layout(locale, Route::Styling, view().fill(content))

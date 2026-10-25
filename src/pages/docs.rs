@@ -4,7 +4,7 @@ use glory::prelude::*;
 use sapid::Theme;
 
 const INSTALL: &str = r#"[dependencies]
-glory = { version = "0.3.1", features = ["web"] }
+glory = { git = "https://github.com/glory-rs/glory", rev = "f710ea096b8cab932e876093f34e90e259197141", default-features = false, features = ["web"] }
 
 # Add hosts only when your application needs them:
 # features = ["web", "ssr", "hydrate"]"#;
@@ -63,15 +63,27 @@ pub fn docs(locale: Locale) -> impl Widget {
                 locale,
                 locale.text("docs-2-build-an-interface"),
                 locale.text("docs-use-built-in-elements-derive-reactive-values-and-implement"),
-                Route::CustomWidgets,
-                locale.text("docs-write-a-custom-widget"),
+                Route::Widgets,
+                locale.text("navigation-explore-building-blocks"),
             ),
             learning_card(
                 locale,
                 locale.text("docs-3-choose-a-host"),
                 locale.text("docs-launch-in-a-browser-generate-ssr-snapshots-or-mount"),
-                Route::Platforms,
-                locale.text("docs-explore-platforms"),
+                Route::Web,
+                locale.text("navigation-build-for-web"),
+            ),
+        ))),
+        Box::new(heading(2, "docs-heading", locale.text("navigation-documentation-map"))),
+        Box::new(copy("docs-paragraph", locale.text("navigation-map-introduction"))),
+        Box::new(documentation_map(locale)),
+        Box::new(view().class("docs-callout").fill((
+            copy("docs-callout-title", locale.text("navigation-sapid-library")),
+            copy("", locale.text("navigation-sapid-introduction")),
+            external(
+                locale.text("navigation-explore-sapid"),
+                crate::navigation::SAPID_URL,
+                "text-link",
             ),
         ))),
         Box::new(heading(2, "docs-heading", locale.text("docs-install-the-framework"))),

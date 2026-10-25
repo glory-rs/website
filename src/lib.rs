@@ -3,6 +3,7 @@ pub mod components;
 pub mod examples;
 pub mod i18n;
 pub mod metadata;
+pub mod navigation;
 pub mod pages;
 pub mod routes;
 

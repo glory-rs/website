@@ -39,7 +39,9 @@ fn page(route: SiteRoute) -> Box<dyn Widget> {
         Route::NotFound => Box::new(pages::not_found(locale)),
     };
     let theme = sapid::Theme::blue_dark();
-    Box::new(view().class(format!("glory-site {}", theme.class())).fill((
+    let section =
+        if crate::navigation::is_documentation(route.page) { " documentation-site" } else { "" };
+    Box::new(view().class(format!("glory-site {}{section}", theme.class())).fill((
         components::header(locale, route.page),
         content,
         components::footer(locale),
