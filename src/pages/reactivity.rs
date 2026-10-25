@@ -1,4 +1,4 @@
-use crate::{Route, components::link, components::*, pages::home::counter};
+use crate::{Route, components::*, pages::home::counter};
 use glory::prelude::*;
 use sapid::Theme;
 
@@ -35,7 +35,7 @@ pub fn reactivity() -> impl Widget {
         Box::new(view().class("docs-playground").fill(counter())),
         Box::new(heading(2, "docs-heading", "Ownership is part of the model")),
         Box::new(copy("docs-paragraph", "Dropping a scope invalidates its handles and cancels owned work. Collection projections and indexed lists preserve precise dependencies without scanning an entire data source.")),
-        Box::new(link("Back to getting started  →", Route::Docs, "text-link")),
+        Box::new(doc_nav(Some(Route::Architecture), Some(Route::Widgets))),
     ];
     docs_layout(Route::Reactivity, view().fill(content))
 }

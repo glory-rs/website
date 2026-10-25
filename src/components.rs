@@ -53,8 +53,10 @@ pub fn header(current: Route) -> impl Widget {
                         .class("desktop-nav")
                         .fill((
                             nav_link("Docs", Route::Docs, current, false),
-                            nav_link("Reactivity", Route::Reactivity, current, false),
-                            nav_link("Sapid", Route::Sapid, current, false),
+                            nav_link("Architecture", Route::Architecture, current, false),
+                            nav_link("Widgets", Route::Widgets, current, false),
+                            nav_link("SSR", Route::Ssr, current, false),
+                            nav_link("Platforms", Route::Platforms, current, false),
                         )),
                     view().class("header-actions").fill((
                         copy("version", "v0.3.1"),
@@ -73,9 +75,11 @@ pub fn header(current: Route) -> impl Widget {
                         .name("Mobile navigation")
                         .class("mobile-nav")
                         .fill((
-                            nav_link("Documentation", Route::Docs, current, true),
-                            nav_link("Reactivity", Route::Reactivity, current, true),
-                            nav_link("Sapid widgets", Route::Sapid, current, true),
+                            nav_link("Get started", Route::Docs, current, true),
+                            nav_link("Architecture", Route::Architecture, current, true),
+                            nav_link("Built-in widgets", Route::Widgets, current, true),
+                            nav_link("SSR & hydration", Route::Ssr, current, true),
+                            nav_link("Platforms", Route::Platforms, current, true),
                             external(
                                 "GitHub repository",
                                 "https://github.com/glory-rs/glory",
@@ -101,13 +105,13 @@ pub fn footer() -> impl Widget {
             view().class("footer-links").fill((
                 view().fill((
                     copy("footer-heading", "Learn"),
-                    link("Get started", Route::Docs, "footer-link"),
-                    link("Reactivity", Route::Reactivity, "footer-link"),
+                    link("Architecture", Route::Architecture, "footer-link"),
+                    link("Write a widget", Route::CustomWidgets, "footer-link"),
                 )),
                 view().fill((
-                    copy("footer-heading", "Ecosystem"),
-                    link("Sapid", Route::Sapid, "footer-link"),
-                    external("Glory on GitHub", "https://github.com/glory-rs/glory", "footer-link"),
+                    copy("footer-heading", "Rendering"),
+                    link("SSR & hydration", Route::Ssr, "footer-link"),
+                    link("Platforms", Route::Platforms, "footer-link"),
                 )),
             )),
         )),
@@ -143,16 +147,43 @@ pub fn feature(content: &str) -> impl Widget {
         .fill((copy("feature-check", "✓"), copy("feature-copy", content.to_owned())))
 }
 
+pub fn doc_nav(previous: Option<Route>, next: Option<Route>) -> impl Widget {
+    let mut links: Vec<Box<dyn Widget>> = Vec::new();
+    if let Some(route) = previous {
+        links.push(Box::new(view().class("docs-prev").fill((
+            copy("docs-nav-kicker", "PREVIOUS"),
+            link(route.title(), route, "docs-nav-link"),
+        ))));
+    }
+    if let Some(route) = next {
+        links.push(Box::new(
+            view().class("docs-next").fill((
+                copy("docs-nav-kicker", "NEXT"),
+                link(route.title(), route, "docs-nav-link"),
+            )),
+        ));
+    }
+    view().role(Role::Navigation).name("Tutorial pagination").class("docs-pagination").fill(links)
+}
+
 pub fn docs_layout(current: Route, content: impl Widget) -> impl Widget {
+    let navigation: Vec<Box<dyn Widget>> = vec![
+        Box::new(copy("docs-sidebar-title", "START HERE")),
+        Box::new(nav_link("Getting started", Route::Docs, current, false)),
+        Box::new(nav_link("Architecture", Route::Architecture, current, false)),
+        Box::new(copy("docs-sidebar-title", "CORE CONCEPTS")),
+        Box::new(nav_link("Reactivity", Route::Reactivity, current, false)),
+        Box::new(nav_link("Built-in widgets", Route::Widgets, current, false)),
+        Box::new(nav_link("Custom widgets", Route::CustomWidgets, current, false)),
+        Box::new(nav_link("Styling", Route::Styling, current, false)),
+        Box::new(copy("docs-sidebar-title", "RENDERING & PLATFORMS")),
+        Box::new(nav_link("Web", Route::Web, current, false)),
+        Box::new(nav_link("SSR & hydration", Route::Ssr, current, false)),
+        Box::new(nav_link("Platforms", Route::Platforms, current, false)),
+        Box::new(external("API on docs.rs ↗", "https://docs.rs/glory", "docs-external-link")),
+    ];
     view().role(Role::Main).class("docs-page").fill((
-        view().role(Role::Navigation).name("Documentation").class("docs-sidebar").fill((
-            copy("docs-sidebar-title", "GUIDE"),
-            nav_link("Getting started", Route::Docs, current, false),
-            nav_link("Reactivity", Route::Reactivity, current, false),
-            copy("docs-sidebar-title", "ECOSYSTEM"),
-            nav_link("Sapid widgets", Route::Sapid, current, false),
-            external("API on docs.rs ↗", "https://docs.rs/glory", "docs-external-link"),
-        )),
+        view().role(Role::Navigation).name("Documentation").class("docs-sidebar").fill(navigation),
         view().class("docs-article").fill(content),
     ))
 }

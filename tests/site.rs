@@ -16,7 +16,7 @@ fn nodes(app: &App) -> Vec<NodeId> {
 fn routes_round_trip_and_unknown_paths_have_a_page() {
     for route in Route::ALL {
         assert_eq!(Route::parse(route.path()), route);
-        assert!(route.title().contains("Glory") || route == Route::Sapid);
+        assert!(route.title().contains("Glory"));
         assert!(!route.description().is_empty());
     }
     assert_eq!(Route::parse("/docs"), Route::Docs);
@@ -32,13 +32,25 @@ fn every_route_has_complete_ssr_content_and_navigation() {
         assert!(html.contains("glory-site"), "{route:?}");
         assert!(html.contains("Primary navigation"), "{route:?}");
         assert!(html.contains("href=\"/docs/\""), "{route:?}");
-        assert!(html.contains("href=\"/sapid/\""), "{route:?}");
+        assert!(html.contains("href=\"/docs/widgets/\""), "{route:?}");
+        if !matches!(route, Route::Home | Route::NotFound) {
+            assert!(html.contains("START HERE"), "{route:?}");
+            assert!(html.contains("CORE CONCEPTS"), "{route:?}");
+            assert!(html.contains("RENDERING &amp; PLATFORMS"), "{route:?}");
+            assert!(html.contains("Tutorial pagination"), "{route:?}");
+        }
         assert!(!html.contains("<iframe"), "{route:?}");
         match route {
             Route::Home => assert!(html.contains("One language.")),
-            Route::Docs => assert!(html.contains("Build your first Glory app.")),
+            Route::Docs => assert!(html.contains("Learn Glory from first principles.")),
+            Route::Architecture => assert!(html.contains("Architecture and design.")),
             Route::Reactivity => assert!(html.contains("Fine-grained reactivity.")),
-            Route::Sapid => assert!(html.contains("Meet Sapid.")),
+            Route::Widgets => assert!(html.contains("Compose with built-in widgets.")),
+            Route::CustomWidgets => assert!(html.contains("Writing custom widgets.")),
+            Route::Styling => assert!(html.contains("Style without losing the boundaries.")),
+            Route::Web => assert!(html.contains("Web applications.")),
+            Route::Ssr => assert!(html.contains("SSR and hydration.")),
+            Route::Platforms => assert!(html.contains("Share widgets across platforms.")),
             Route::NotFound => assert!(html.contains("This page drifted away.")),
         }
     }
@@ -112,5 +124,5 @@ fn mobile_navigation_is_controlled_by_rust_state() {
     assert_eq!(mobile_links(), 0);
     app.dispatch(toggle, Event::Activate).unwrap();
     app.flush().unwrap();
-    assert_eq!(mobile_links(), 4);
+    assert_eq!(mobile_links(), 6);
 }

@@ -1,11 +1,23 @@
+mod architecture;
+mod custom_widgets;
 mod docs;
 mod home;
 mod not_found;
+mod platforms;
 mod reactivity;
-mod sapid;
+mod ssr;
+mod styling;
+mod web;
+mod widgets;
 
+pub use architecture::architecture;
+pub use custom_widgets::custom_widgets;
 pub use docs::docs;
 pub use home::home;
 pub use not_found::not_found;
+pub use platforms::platforms;
 pub use reactivity::reactivity;
-pub use sapid::sapid_page;
+pub use ssr::ssr;
+pub use styling::styling;
+pub use web::web;
+pub use widgets::widgets;

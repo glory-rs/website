@@ -34,12 +34,12 @@ const output = 'D:/BuildCache/glory-website/browser-report.json';
     const primary = page.getByRole('navigation', { name: 'Primary navigation' });
     await primary.getByRole('link', { name: 'Docs', exact: true }).click();
     await page.waitForURL('**/docs/');
-    await page.getByRole('heading', { name: 'Build your first Glory app.' }).waitFor();
-    await primary.getByRole('link', { name: 'Reactivity', exact: true }).click();
-    await page.waitForURL('**/docs/reactivity/');
-    await page.getByRole('heading', { name: 'Fine-grained reactivity.' }).waitFor();
+    await page.getByRole('heading', { name: 'Learn Glory from first principles.' }).waitFor();
+    await primary.getByRole('link', { name: 'Architecture', exact: true }).click();
+    await page.waitForURL('**/docs/architecture/');
+    await page.getByRole('heading', { level: 1 }).waitFor();
     await page.goBack();
-    await page.getByRole('heading', { name: 'Build your first Glory app.' }).waitFor();
+    await page.getByRole('heading', { name: 'Learn Glory from first principles.' }).waitFor();
     check('History routing and back navigation');
 
     await page.goto(`${base}/`);
@@ -60,7 +60,7 @@ const output = 'D:/BuildCache/glory-website/browser-report.json';
 
     for (const width of [1280, 768, 390, 320]) {
       await page.setViewportSize({ width, height: 800 });
-      for (const path of ['/', '/docs/', '/docs/reactivity/', '/sapid/']) {
+      for (const path of ['/', '/docs/', '/docs/architecture/', '/docs/reactivity/', '/docs/widgets/', '/docs/custom-widgets/', '/docs/styling/', '/docs/web/', '/docs/ssr/', '/docs/platforms/']) {
         await page.goto(`${base}${path}`);
         await page.waitForFunction(() => window.gloryReady === true);
         const dimensions = await page.evaluate(() => ({ viewport: innerWidth, content: document.documentElement.scrollWidth }));
@@ -82,9 +82,9 @@ const output = 'D:/BuildCache/glory-website/browser-report.json';
     await page.getByRole('button', { name: 'Toggle navigation' }).click();
     const mobile = page.getByRole('navigation', { name: 'Mobile navigation' });
     await mobile.waitFor();
-    await mobile.getByRole('link', { name: 'Documentation' }).click();
+    await mobile.getByRole('link', { name: 'Get started', exact: true }).click();
     await page.waitForURL('**/docs/');
-    await page.getByRole('heading', { name: 'Build your first Glory app.' }).waitFor();
+    await page.getByRole('heading', { name: 'Learn Glory from first principles.' }).waitFor();
     check('Mobile navigation opens and routes');
 
     await page.goto(`${base}/404.html`);

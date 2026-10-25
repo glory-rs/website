@@ -26,8 +26,14 @@ fn page(route: Route) -> Box<dyn Widget> {
     let content: Box<dyn Widget> = match route {
         Route::Home => Box::new(pages::home()),
         Route::Docs => Box::new(pages::docs()),
+        Route::Architecture => Box::new(pages::architecture()),
         Route::Reactivity => Box::new(pages::reactivity()),
-        Route::Sapid => Box::new(pages::sapid_page()),
+        Route::Widgets => Box::new(pages::widgets()),
+        Route::CustomWidgets => Box::new(pages::custom_widgets()),
+        Route::Styling => Box::new(pages::styling()),
+        Route::Web => Box::new(pages::web()),
+        Route::Ssr => Box::new(pages::ssr()),
+        Route::Platforms => Box::new(pages::platforms()),
         Route::NotFound => Box::new(pages::not_found()),
     };
     let theme = sapid::Theme::blue_dark();

@@ -1,16 +1,32 @@
 # Glory website
 
-The official Glory website, built with Glory semantic widgets and Sapid. The site uses synchronous static generation and WebAssembly hydration; page UI and behavior are handwritten Rust.
+The official Glory learning site, built with Glory semantic widgets and Sapid. The site uses synchronous static generation and WebAssembly hydration; page UI and behavior are handwritten Rust.
+
+The content focuses on Glory itself: its design principles, built-in semantic widgets, custom Widget implementations, reactivity, styling, WebAssembly, SSR, hydration, and cross-platform hosts.
 
 ## Pages
 
-- `/` — framework overview, live counter, SSR/hydration, and Sapid examples
-- `/docs/` — installation and first application
-- `/docs/reactivity/` — Cage, Bond, Lotus, and a live example
-- `/sapid/` — widget library overview and interactive controls
+- `/` — design overview, live Glory counter, host model, and learning paths
+- `/docs/` — introduction, installation, first application, and reading guide
+- `/docs/architecture/` — retained semantics, typed patches, Owners, and hosts
+- `/docs/reactivity/` — Cage, Bond, Lotus, and live examples
+- `/docs/widgets/` — Glory's built-in elements, control flow, and lists
+- `/docs/custom-widgets/` — implementing the Widget trait in Rust
+- `/docs/styling/` — typed styles, external CSS, and bounded stylesheets
+- `/docs/web/` — WebAssembly launch and browser host lifecycle
+- `/docs/ssr/` — HTML, snapshots, hydration, resources, and streaming
+- `/docs/platforms/` — Web, SSR, and Blitz desktop capabilities and boundaries
 - `/404.html` — rendered not-found page
 
 The current checkout uses sibling path dependencies on `../glory` and `../sapid`.
+
+## Automatic deployment
+
+Pushes to `main` build and publish the production site at
+<https://glory-website-3fn.pages.dev/> through GitHub Actions and Cloudflare Pages.
+The workflow checks out the dependency revisions pinned in
+`deploy/dependencies.json`, runs native tests, and generates release HTML/WASM.
+See [deployment setup and troubleshooting](deploy/README.md).
 
 ## Requirements
 
@@ -41,7 +57,7 @@ cargo test --locked --all-targets
 ./scripts/check.ps1 -Browser
 ```
 
-The full gate runs formatting, native tests, strict native and wasm32 Clippy, the WASM/SSR build, and real Chromium acceptance. Browser checks cover hydration, counter updates, code copy, History navigation, no-JavaScript SSR, mobile navigation, the 404 page, and horizontal overflow at 320/390/768/1280px.
+The full gate runs formatting, native tests, strict native and wasm32 Clippy, the WASM/SSR build, and real Chromium acceptance. Browser checks cover hydration, counter updates, code copy, History navigation, no-JavaScript SSR, mobile navigation, the 404 page, and horizontal overflow/header overlap at 320/390/768/1280px.
 
 Build artifacts, Cargo target files, temporary files, and reports stay under `D:/BuildCache/glory-website`.
 
@@ -50,7 +66,7 @@ Build artifacts, Cargo target files, temporary files, and reports stay under `D:
 - `src/app.rs` — shared route-driven application
 - `src/routes.rs` — bounded route and metadata catalogue
 - `src/components.rs` — navigation, footer, documentation, and code widgets
-- `src/pages/` — home, guide, reactivity, Sapid, and 404 pages
+- `src/pages/` — home, learning guides, and 404 page
 - `src/web.rs` — browser History, launch, and hydration host
 - `src/bin/generate.rs` — static HTML generation from Glory SSR snapshots
 - `styles/site.css` — site design and responsive layout
