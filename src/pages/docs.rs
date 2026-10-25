@@ -3,26 +3,16 @@ use crate::{Route, components::link, components::*};
 use glory::prelude::*;
 use sapid::Theme;
 
-const INSTALL: &str = r#"[dependencies]
+const INSTALL: &str = r#"[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
 glory = { git = "https://github.com/glory-rs/glory", rev = "f710ea096b8cab932e876093f34e90e259197141", default-features = false, features = ["web"] }
 
 # Add hosts only when your application needs them:
 # features = ["web", "ssr", "hydrate"]"#;
 
-const FIRST_APP: &str = r#"use glory::prelude::*;
-
-fn hello() -> impl Widget {
-    col().fill((
-        text()
-            .kind(TextKind::Heading(1))
-            .content("Hello, Glory"),
-        text().content("Semantic UI, handwritten in Rust."),
-    ))
-}
-
-// In a wasm32 browser host:
-let app = glory::web::launch(root, hello())?;
-// Keep the returned WebApp alive."#;
+const FIRST_APP: &str = include_str!("../examples/getting_started.rs");
 
 fn learning_card(
     locale: Locale,
@@ -97,7 +87,9 @@ pub fn docs(locale: Locale) -> impl Widget {
             "docs-paragraph",
             locale.text("docs-widgets-are-ordinary-rust-values-builders-describe-semantic-nodes"),
         )),
-        Box::new(code_panel(locale, Theme::blue_dark(), "main.rs", FIRST_APP, "docs-code")),
+        Box::new(code_panel(locale, Theme::blue_dark(), "src/lib.rs", FIRST_APP, "docs-code")),
+        Box::new(copy("docs-paragraph", locale.text("docs-mount-first-widget"))),
+        Box::new(link(locale, locale.text("docs-open-web-guide"), Route::Web, "text-link")),
         Box::new(heading(2, "docs-heading", locale.text("docs-what-happens-next"))),
         Box::new(copy(
             "docs-paragraph",

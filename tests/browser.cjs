@@ -40,12 +40,12 @@ const plain = text => text.replace(/[\u2068\u2069]/g, '');
     const primary = page.getByRole('navigation', { name: 'Primary navigation' });
     await primary.getByRole('link', { name: 'Docs', exact: true }).click();
     await page.waitForURL('**/docs/');
-    await page.getByRole('heading', { name: 'Learn Glory from first principles.' }).waitFor();
+    await page.getByRole('heading', { name: 'Getting started' }).waitFor();
     await page.locator('.docs-sidebar').getByRole('link', { name: 'Architecture', exact: true }).click();
     await page.waitForURL('**/docs/architecture/');
     await page.getByRole('heading', { level: 1 }).waitFor();
     await page.goBack();
-    await page.getByRole('heading', { name: 'Learn Glory from first principles.' }).waitFor();
+    await page.getByRole('heading', { name: 'Getting started' }).waitFor();
     check('History routing and back navigation');
 
     await page.setViewportSize({ width: 1440, height: 1000 });
@@ -156,6 +156,19 @@ const plain = text => text.replace(/[\u2068\u2069]/g, '');
           const dimensions = await page.evaluate(() => ({ viewport: innerWidth, content: document.documentElement.scrollWidth }));
           assert.ok(dimensions.content <= dimensions.viewport, `${path} overflows at ${width}px: ${dimensions.content}px`);
           if (chapter !== '/') {
+            const typography = await page.locator('.docs-article').evaluate(article => {
+              const title = article.querySelector('h1');
+              const subheading = article.querySelector('h2');
+              return {
+                title: parseFloat(getComputedStyle(title).fontSize),
+                body: parseFloat(getComputedStyle(article).fontSize),
+                subtitle: subheading ? parseFloat(getComputedStyle(subheading).fontSize) : 0,
+                titleHeight: title.getBoundingClientRect().height,
+                lineHeight: parseFloat(getComputedStyle(title).lineHeight),
+              };
+            });
+            assert.ok(typography.title <= 40 && typography.title > typography.subtitle && typography.title > typography.body, `${path}: readable heading hierarchy at ${width}px: ${JSON.stringify(typography)}`);
+            assert.ok(typography.titleHeight <= typography.lineHeight * 3 + 1, `${path}: title takes more than three lines at ${width}px`);
             const spacing = await page.evaluate(() => ({
               header: document.querySelector('.site-header').getBoundingClientRect().bottom,
               content: document.querySelector('.docs-sidebar').getBoundingClientRect().top,
@@ -165,7 +178,7 @@ const plain = text => text.replace(/[\u2068\u2069]/g, '');
         }
       }
     }
-    check('Both languages: no horizontal overflow or header overlap at 1280, 768, 390, or 320px');
+    check('Both languages: readable title hierarchy, bounded wrapping and no overflow/header overlap at four viewport widths');
 
     await page.setViewportSize({ width: 390, height: 800 });
     await page.goto(`${base}/`);
@@ -176,12 +189,12 @@ const plain = text => text.replace(/[\u2068\u2069]/g, '');
     assert.equal(await mobile.getByRole('link', { name: 'Sapid ↗', exact: true }).getAttribute('href'), 'https://sapid.taidge.org/');
     await mobile.getByRole('link', { name: 'Docs', exact: true }).click();
     await page.waitForURL('**/docs/');
-    await page.getByRole('heading', { name: 'Learn Glory from first principles.' }).waitFor();
+    await page.getByRole('heading', { name: 'Getting started' }).waitFor();
     check('Mobile navigation opens and routes');
 
     await page.goto(`${base}/404.html`);
     await page.waitForFunction(() => window.gloryReady === true);
-    await page.getByRole('heading', { name: 'This page drifted away.' }).waitFor();
+    await page.getByRole('heading', { name: 'Page not found' }).waitFor();
     check('Rendered 404 page');
 
     await page.setViewportSize({ width: 1280, height: 900 });
@@ -194,7 +207,7 @@ const plain = text => text.replace(/[\u2068\u2069]/g, '');
     assert.ok(identity);
     await chooseLanguage('简体中文');
     await page.waitForURL('**/zh/docs/web/?source=language#example');
-    await page.getByRole('heading', { name: 'Web 应用。', exact: true }).waitFor();
+    await page.getByRole('heading', { name: 'Web 应用', exact: true }).waitFor();
     assert.equal(await page.locator('html').getAttribute('lang'), 'zh-CN');
     assert.equal(await page.title(), 'Web 应用 — Glory');
     assert.equal(await page.locator('link[rel=canonical]').getAttribute('href'), 'https://glory.taidge.org/zh/docs/web/');
@@ -205,9 +218,9 @@ const plain = text => text.replace(/[\u2068\u2069]/g, '');
     assert.equal(await page.evaluate(() => !!window.testHeading && !window.testHeading.isConnected), true);
     await chooseLanguage('English');
     await page.waitForURL('**/docs/web/?source=language#example');
-    await page.getByRole('heading', { name: 'Web applications.', exact: true }).waitFor();
+    await page.getByRole('heading', { name: 'Web applications', exact: true }).waitFor();
     await page.goBack();
-    await page.getByRole('heading', { name: 'Web 应用。', exact: true }).waitFor();
+    await page.getByRole('heading', { name: 'Web 应用', exact: true }).waitFor();
     assert.equal(await page.locator('html').getAttribute('lang'), 'zh-CN');
     check('Language switching and Back preserve chapter, query, fragment and metadata');
 
@@ -240,16 +253,16 @@ const plain = text => text.replace(/[\u2068\u2069]/g, '');
     await page.getByRole('button', { name: '切换导航', exact: true }).click();
     await page.getByRole('navigation', { name: '移动端导航' }).getByRole('link', { name: '文档', exact: true }).click();
     await page.waitForURL('**/zh/docs/');
-    await page.getByRole('heading', { name: '从基本原理学习 Glory。' }).waitFor();
+    await page.getByRole('heading', { name: '快速入门' }).waitFor();
     check('Chinese counter, copy and mobile navigation work after hydration');
 
     const chineseStatic = await browser.newContext({ javaScriptEnabled: false });
     const staticZh = await chineseStatic.newPage();
     await staticZh.goto(`${base}/zh/docs/ssr/`);
-    await staticZh.getByRole('heading', { name: 'SSR 与水合。', exact: true }).waitFor();
+    await staticZh.getByRole('heading', { name: 'SSR 与水合', exact: true }).waitFor();
     assert.equal(await staticZh.locator('html').getAttribute('lang'), 'zh-CN');
     await chineseStatic.close();
-    for (const [path, heading, lang] of [['/missing/deep', 'This page drifted away.', 'en'], ['/zh/missing/deep', '这个页面走丢了。', 'zh-CN']]) {
+    for (const [path, heading, lang] of [['/missing/deep', 'Page not found', 'en'], ['/zh/missing/deep', '页面不存在', 'zh-CN']]) {
       const response = await page.goto(`${base}${path}`);
       assert.equal(response.status(), 404);
       await page.waitForFunction(() => window.gloryReady === true);
@@ -268,7 +281,7 @@ const plain = text => text.replace(/[\u2068\u2069]/g, '');
     await page.getByRole('navigation', { name: 'Documentation', exact: true })
       .getByRole('link', { name: 'Internationalization', exact: true }).click();
     await page.waitForURL('**/docs/i18n/');
-    await page.getByRole('heading', { name: 'Internationalization with glory-i18n.', exact: true }).waitFor();
+    await page.getByRole('heading', { name: 'Internationalization', exact: true }).waitFor();
     assert.equal(await page.getByRole('navigation', { name: 'Documentation', exact: true }).locator('[aria-current="page"]').count(), 1);
     const demo = page.locator('.i18n-demo');
     assert.equal(plain(await demo.locator('.i18n-demo-message').textContent()), 'You have one message.');
@@ -293,7 +306,7 @@ const plain = text => text.replace(/[\u2068\u2069]/g, '');
     await page.waitForFunction(() => document.activeElement?.textContent === '简体中文');
     await page.getByRole('menuitem', { name: '简体中文', exact: true }).press('Enter');
     await page.waitForURL('**/zh/docs/i18n/?source=guide#demo');
-    await page.getByRole('heading', { name: '使用 glory-i18n 实现国际化。', exact: true }).waitFor();
+    await page.getByRole('heading', { name: '国际化', exact: true }).waitFor();
     assert.equal(await page.locator('html').getAttribute('lang'), 'zh-CN');
     assert.equal(await page.locator('link[rel=canonical]').getAttribute('href'), 'https://glory.taidge.org/zh/docs/i18n/');
     const zhPicker = page.locator('.language-picker').getByRole('button', { name: '简体中文', exact: true });
@@ -314,7 +327,7 @@ const plain = text => text.replace(/[\u2068\u2069]/g, '');
     await page.getByRole('menu', { name: '简体中文', exact: true }).waitFor({ state: 'hidden' });
     assert.ok(page.url().endsWith('/zh/docs/i18n/?source=guide#demo'));
     const staticGuide = await browser.newContext({ javaScriptEnabled: false });
-    for (const [prefix, name] of [['', 'Internationalization with glory-i18n.'], ['/zh', '使用 glory-i18n 实现国际化。']]) {
+    for (const [prefix, name] of [['', 'Internationalization'], ['/zh', '国际化']]) {
       const staticGuidePage = await staticGuide.newPage();
       await staticGuidePage.goto(`${base}${prefix}/docs/i18n/`);
       await staticGuidePage.getByRole('heading', { name, exact: true }).waitFor();
@@ -341,6 +354,14 @@ const plain = text => text.replace(/[\u2068\u2069]/g, '');
     await page.waitForFunction(() => window.gloryReady === true);
     await page.locator('.docs-map').scrollIntoViewIfNeeded();
     await page.screenshot({ path: 'D:/BuildCache/glory-website/navigation-overview.png', fullPage: false });
+
+    await page.goto(`${base}/zh/docs/`);
+    await page.waitForFunction(() => window.gloryReady === true);
+    await page.screenshot({ path: 'D:/BuildCache/glory-website/reading-desktop.png' });
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto(`${base}/zh/docs/`);
+    await page.waitForFunction(() => window.gloryReady === true);
+    await page.screenshot({ path: 'D:/BuildCache/glory-website/reading-mobile.png' });
 
     assert.deepEqual(report.errors, [], 'Browser console and hydration errors');
     check('No browser console or hydration errors');

@@ -31,6 +31,12 @@ Hover has its own appearance. Desktop and mobile share the same global links.
 Long documentation pages keep the header and desktop chapter navigation visible;
 the sidebar scrolls within the remaining viewport height.
 
+Documentation uses a compact reading scale, separate from the homepage hero:
+28–36px titles, 20–24px section headings, and normal body text. Keep headings
+short in both languages and put explanations in the lead. The getting-started
+snippet is compiled from `src/examples/getting_started.rs`; the Web guide
+provides the complete browser host setup.
+
 The API source link and installation example use the pinned Glory revision in
 `deploy/dependencies.json`. Keep them aligned when adopting another revision;
 the old docs.rs 0.3.1 release documents the previous architecture.

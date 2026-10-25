@@ -30,7 +30,7 @@ desktop = ["glory/blitz-shell"]
 desktop-accessibility = ["glory/blitz-accesskit"]
 
 [dependencies]
-glory = { version = "0.3.1", default-features = false }"#;
+glory = { git = "https://github.com/glory-rs/glory", rev = "f710ea096b8cab932e876093f34e90e259197141", default-features = false }"#;
 
 const WEB_AND_SSR: &str = r#"// Native server: produce a versioned fragment for an otherwise empty mount.
 let snapshot = glory::ssr::snapshot(counter())?;

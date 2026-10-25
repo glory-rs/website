@@ -43,17 +43,17 @@ fn every_route_has_complete_ssr_content_and_navigation() {
         assert!(!html.contains("<iframe"), "{route:?}");
         match route {
             Route::Home => assert!(html.contains("One language.")),
-            Route::Docs => assert!(html.contains("Learn Glory from first principles.")),
-            Route::Architecture => assert!(html.contains("Architecture and design.")),
-            Route::Reactivity => assert!(html.contains("Fine-grained reactivity.")),
-            Route::Widgets => assert!(html.contains("Compose with built-in widgets.")),
-            Route::CustomWidgets => assert!(html.contains("Writing custom widgets.")),
-            Route::Styling => assert!(html.contains("Style without losing the boundaries.")),
-            Route::I18n => assert!(html.contains("Internationalization with glory-i18n.")),
-            Route::Web => assert!(html.contains("Web applications.")),
-            Route::Ssr => assert!(html.contains("SSR and hydration.")),
-            Route::Platforms => assert!(html.contains("Share widgets across platforms.")),
-            Route::NotFound => assert!(html.contains("This page drifted away.")),
+            Route::Docs => assert!(html.contains("Getting started")),
+            Route::Architecture => assert!(html.contains("Architecture")),
+            Route::Reactivity => assert!(html.contains("Reactivity")),
+            Route::Widgets => assert!(html.contains("Built-in widgets")),
+            Route::CustomWidgets => assert!(html.contains("Custom widgets")),
+            Route::Styling => assert!(html.contains("Styles and themes")),
+            Route::I18n => assert!(html.contains("Internationalization")),
+            Route::Web => assert!(html.contains("Web applications")),
+            Route::Ssr => assert!(html.contains("SSR and hydration")),
+            Route::Platforms => assert!(html.contains("Platform support")),
+            Route::NotFound => assert!(html.contains("Page not found")),
         }
     }
 }
@@ -256,4 +256,7 @@ fn documentation_groups_cover_all_chapters_once_and_sapid_example_renders() {
     let html =
         glory::ssr::snapshot(glory_website::examples::sapid_action::save_action()).unwrap().html;
     assert!(html.contains("Save changes"));
+    let hello =
+        glory::ssr::snapshot(glory_website::examples::getting_started::hello()).unwrap().html;
+    assert!(hello.contains("Hello, Glory"));
 }

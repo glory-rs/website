@@ -63,11 +63,11 @@ pub(crate) fn counter(locale: Locale) -> impl Widget {
     })
 }
 
-fn browser_preview(content: impl Widget) -> impl Widget {
+fn browser_preview(locale: Locale, content: impl Widget) -> impl Widget {
     view().class("browser-preview").fill((
         view().class("browser-chrome").fill((
             view().class("browser-dots").fill((copy("", "●"), copy("", "●"), copy("", "●"))),
-            copy("browser-address", "localhost:8796"),
+            copy("browser-address", locale.text("home-live-example")),
         )),
         view().class("browser-content").fill(content),
     ))
@@ -147,7 +147,7 @@ pub fn home(locale: Locale) -> impl Widget {
             )),
             view().class("example-grid").fill((
                 code_panel(locale, theme.clone(), "counter.rs", COUNTER_CODE, ""),
-                browser_preview(view().fill((
+                browser_preview(locale, view().fill((
                     copy("preview-kicker", locale.text("home-live-glory-widget")),
                     heading(3, "preview-title", locale.text("home-a-small-real-counter")),
                     copy("preview-copy", locale.text("home-built-with-glory-s-own-button-text-view-and")),

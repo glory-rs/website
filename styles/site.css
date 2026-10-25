@@ -22,6 +22,7 @@
   --content-width: 1180px;
   --page-gutter: clamp(1.25rem, 4vw, 3rem);
   --radius: 1.25rem;
+  --doc-title-size: clamp(1.75rem, calc(1.5rem + 1vw), 2.25rem);
   --shadow: 0 24px 70px rgba(1, 4, 12, 0.34);
 }
 
@@ -114,6 +115,10 @@ h3 {
   overflow: clip;
 }
 
+.documentation-site .header-inner {
+  min-height: 4.5rem;
+}
+
 .documentation-site > .site-header {
   position: fixed;
   background: rgba(9, 13, 24, 0.97);
@@ -152,7 +157,7 @@ h3 {
   max-width: 18ch;
   margin-bottom: 1.25rem;
   color: var(--ink-strong);
-  font-size: clamp(2rem, 4vw, 3.4rem);
+  font-size: clamp(1.75rem, 3vw, 2.4rem);
   font-weight: 600;
   line-height: 1.08;
   letter-spacing: -0.045em;
@@ -425,7 +430,7 @@ h3 {
   max-width: 12ch;
   margin-bottom: 1.6rem;
   color: #fff;
-  font-size: clamp(3.25rem, 6.4vw, 5.7rem);
+  font-size: clamp(3rem, 5.5vw, 4.75rem);
   font-weight: 600;
   line-height: 0.99;
   letter-spacing: -0.065em;
@@ -651,6 +656,8 @@ h3 {
 }
 
 .code-content code {
+  font-size: 0.875rem;
+  line-height: 1.65;
   font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Consolas, monospace;
 }
 
@@ -681,7 +688,7 @@ h3 {
   flex: 0 0 auto;
   gap: 0.38rem;
   color: #556076;
-  font-size: 0.65rem;
+  font-size: 0.7rem;
 }
 
 .browser-dots > :first-child { color: #d87387; }
@@ -716,7 +723,7 @@ h3 {
 
 .preview-kicker {
   margin-bottom: 0.9rem;
-  font-size: 0.65rem;
+  font-size: 0.7rem;
 }
 
 .preview-title {
@@ -867,7 +874,7 @@ h3 {
 .cta-title {
   margin: 0.85rem 0 1.75rem;
   color: #fff;
-  font-size: clamp(2rem, 4.5vw, 3.5rem);
+  font-size: clamp(1.75rem, 3vw, 2.5rem);
   font-weight: 600;
   line-height: 1.1;
   letter-spacing: -0.045em;
@@ -879,19 +886,19 @@ h3 {
   grid-template-columns: 13.5rem minmax(0, 1fr);
   align-items: start;
   min-width: 0;
-  padding-top: clamp(8rem, 12vw, 10rem);
+  padding-top: 7.5rem;
   padding-bottom: clamp(5rem, 9vw, 8rem);
   gap: clamp(2.5rem, 7vw, 6.5rem);
 }
 
 .docs-sidebar {
   position: sticky;
-  top: 6rem;
+  top: 5rem;
   display: flex;
   flex-direction: column;
   min-width: 0;
-  padding: 1.25rem 0;
-  max-height: calc(100dvh - 7rem);
+  padding: 0.25rem 0;
+  max-height: calc(100dvh - 6rem);
   overflow-y: auto;
   overscroll-behavior: contain;
   scrollbar-width: thin;
@@ -900,7 +907,7 @@ h3 {
 .docs-sidebar-title {
   margin: 1.25rem 0.85rem 0.45rem;
   color: var(--subtle);
-  font-size: 0.65rem;
+  font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.15em;
   text-transform: uppercase;
@@ -973,49 +980,50 @@ h3 {
 }
 
 .docs-title {
-  margin-bottom: 1.4rem;
+  margin-bottom: 1rem;
   color: var(--ink-strong);
-  font-size: clamp(2.5rem, 5.5vw, 4.5rem);
+  font-size: var(--doc-title-size);
   font-weight: 600;
-  line-height: 1.05;
-  letter-spacing: -0.055em;
+  line-height: 1.3;
+  letter-spacing: -0.025em;
   text-wrap: balance;
   overflow-wrap: break-word;
 }
 
 .docs-lead {
   max-width: 46rem;
-  margin-bottom: 2.5rem;
+  margin-bottom: 1.75rem;
   color: var(--muted);
-  font-size: clamp(1.05rem, 1.8vw, 1.2rem);
-  line-height: 1.8;
+  font-size: 1.0625rem;
+  line-height: 1.75;
 }
 
 .docs-heading {
-  margin: clamp(3.25rem, 6vw, 4.75rem) 0 1rem;
+  margin: 2.5rem 0 0.875rem;
   color: var(--ink-strong);
-  font-size: clamp(1.5rem, 2.5vw, 2rem);
+  font-size: clamp(1.25rem, calc(1.1rem + 0.4vw), 1.5rem);
   font-weight: 600;
   line-height: 1.25;
   letter-spacing: -0.03em;
-  scroll-margin-top: 2rem;
+  scroll-margin-top: 6rem;
 }
 
 .docs-paragraph {
-  margin-bottom: 1.4rem;
+  max-width: 72ch;
+  margin-bottom: 1rem;
   color: #b6bfd0;
-  line-height: 1.85;
+  line-height: 1.75;
 }
 
 .docs-callout {
-  margin-block: 2rem 3rem;
+  margin-block: 1.5rem 2rem;
   padding: 1.2rem 1.35rem;
   border: 1px solid rgba(91, 211, 199, 0.18);
   border-left: 3px solid var(--teal);
   border-radius: 0.65rem;
   color: var(--muted);
   background: rgba(91, 211, 199, 0.045);
-  font-size: 0.9rem;
+  font-size: 0.9375rem;
   line-height: 1.75;
 }
 
@@ -1051,7 +1059,7 @@ h3 {
   border-radius: 0.85rem;
   color: var(--muted);
   background: var(--surface);
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
   line-height: 1.75;
   transition: border-color 180ms ease, transform 180ms ease;
 }
@@ -1059,14 +1067,13 @@ h3 {
 .docs-host-card:hover,
 .concept-card:hover {
   border-color: var(--line-strong);
-  transform: translateY(-2px);
 }
 
 .docs-card-title,
 .concept-title {
   margin-bottom: 0.55rem;
   color: var(--ink-strong);
-  font-size: 1.05rem;
+  font-size: 1.125rem;
   font-weight: 600;
   line-height: 1.3;
 }
@@ -1148,7 +1155,7 @@ h3 {
   margin-bottom: 0.5rem;
   color: var(--teal);
   font-family: "JetBrains Mono", monospace;
-  font-size: clamp(4rem, 12vw, 8rem);
+  font-size: clamp(3rem, 8vw, 5rem);
   font-weight: 600;
   line-height: 1;
   letter-spacing: -0.08em;
@@ -1291,7 +1298,7 @@ h3 {
 
 .docs-nav-kicker {
   color: var(--subtle);
-  font-size: 0.65rem;
+  font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.12em;
 }
@@ -1422,7 +1429,7 @@ h3 {
   }
 
   .hero-title {
-    font-size: clamp(3rem, 7.5vw, 4.5rem);
+    font-size: clamp(2.75rem, 6.5vw, 4rem);
   }
 
   .intro {
@@ -1484,7 +1491,7 @@ h3 {
 
   .hero-title {
     max-width: 100%;
-    font-size: clamp(2.9rem, 13vw, 4.25rem);
+    font-size: clamp(2.5rem, 9vw, 3.5rem);
   }
 
   .hero-lead {
@@ -1561,6 +1568,7 @@ h3 {
   }
 
   .docs-sidebar-title {
+    display: none;
     grid-column: 1 / -1;
     margin: 0.75rem 0.25rem 0.2rem;
   }
@@ -1614,7 +1622,7 @@ h3 {
   }
 
   .hero-title {
-    font-size: clamp(2.65rem, 13.5vw, 3.6rem);
+    font-size: clamp(2.5rem, 9vw, 3.25rem);
     letter-spacing: -0.055em;
   }
 
@@ -1684,7 +1692,7 @@ h3 {
   }
 
   .docs-title {
-    font-size: clamp(2.25rem, 11vw, 3.25rem);
+    font-size: var(--doc-title-size);
   }
 
   .docs-callout {
@@ -1837,11 +1845,11 @@ h3 {
 .i18n-demo { gap: 1rem; }
 .i18n-demo-message { font-size: 1.125rem; }
 .i18n-demo-actions { flex-wrap: wrap; gap: 0.65rem; }
-html[lang="zh-CN"] .hero-title { font-size: clamp(3rem, 6vw, 5.75rem); line-height: 1.25; }
+html[lang="zh-CN"] .hero-title { font-size: clamp(2.75rem, 5vw, 4.5rem); line-height: 1.25; }
 html[lang="zh-CN"] .docs-paragraph,
-html[lang="zh-CN"] .docs-lead { line-height: 1.9; }
+html[lang="zh-CN"] .docs-lead { line-height: 1.85; }
 @media (max-width: 600px) {
   .header-actions { gap: 0.55rem; }
   .header-actions .version, .header-actions .github-link { display: none; }
-  html[lang="zh-CN"] .hero-title { font-size: clamp(2.3rem, 10vw, 3.5rem); }
+  html[lang="zh-CN"] .hero-title { font-size: clamp(2rem, 8vw, 3rem); }
 }

@@ -1,3 +1,4 @@
+pub mod getting_started;
 #[cfg(target_arch = "wasm32")]
 pub mod i18n_browser;
 pub mod i18n_catalog;
