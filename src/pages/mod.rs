@@ -1,5 +1,6 @@
 mod architecture;
 mod custom_widgets;
+mod display;
 mod docs;
 mod home;
 mod i18n;
@@ -13,6 +14,7 @@ mod widgets;
 
 pub use architecture::architecture;
 pub use custom_widgets::custom_widgets;
+pub use display::display;
 pub use docs::docs;
 pub use home::home;
 pub use i18n::i18n;

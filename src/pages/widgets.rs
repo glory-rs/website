@@ -162,6 +162,16 @@ pub fn widgets(locale: Locale) -> impl Widget {
                 locale.text("widgets-glory-provides-view-group-text-button-input-check-image"),
             ),
         ))),
+        Box::new(view().class("docs-callout").fill((
+            copy("docs-callout-title", locale.text("display-widget-guide-title")),
+            copy("", locale.text("display-widget-guide-body")),
+            crate::components::link(
+                locale,
+                locale.text("display-home-link"),
+                Route::Display,
+                "text-link",
+            ),
+        ))),
         Box::new(heading(2, "docs-heading", locale.text("widgets-sapid-heading"))),
         Box::new(copy("docs-paragraph", locale.text("widgets-sapid-description"))),
         Box::new(code_panel(
@@ -277,7 +287,7 @@ pub fn widgets(locale: Locale) -> impl Widget {
             "docs-paragraph",
             locale.text("widgets-use-stable-keys-in-both-collection-builders-prefer-each"),
         )),
-        Box::new(doc_nav(locale, Some(Route::Reactivity), Some(Route::CustomWidgets))),
+        Box::new(doc_nav(locale, Some(Route::Display), Some(Route::CustomWidgets))),
     ];
     docs_layout(locale, Route::Widgets, view().fill(content))
 }

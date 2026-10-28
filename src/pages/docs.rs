@@ -7,7 +7,7 @@ const INSTALL: &str = r#"[lib]
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-glory = { git = "https://github.com/glory-rs/glory", rev = "f710ea096b8cab932e876093f34e90e259197141", default-features = false, features = ["web"] }
+glory = { git = "https://github.com/glory-rs/glory", rev = "3c0c6576a38ddbd48211012f2a60ecaa7140816e", default-features = false, features = ["web"] }
 
 # Add hosts only when your application needs them:
 # features = ["web", "ssr", "hydrate"]"#;
@@ -40,6 +40,7 @@ pub fn docs(locale: Locale) -> impl Widget {
             copy("docs-callout-title", locale.text("docs-before-you-start")),
             copy("", locale.text("docs-the-guide-assumes-basic-rust-knowledge-glory-s-current")),
         ))),
+        Box::new(link(locale, locale.text("display-home-link"), Route::Display, "text-link")),
         Box::new(heading(2, "docs-heading", locale.text("docs-choose-your-learning-path"))),
         Box::new(view().class("learning-grid").fill((
             learning_card(

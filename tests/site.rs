@@ -46,6 +46,7 @@ fn every_route_has_complete_ssr_content_and_navigation() {
             Route::Docs => assert!(html.contains("Getting started")),
             Route::Architecture => assert!(html.contains("Architecture")),
             Route::Reactivity => assert!(html.contains("Reactivity")),
+            Route::Display => assert!(html.contains("XML DSL and display templates")),
             Route::Widgets => assert!(html.contains("Built-in widgets")),
             Route::CustomWidgets => assert!(html.contains("Custom widgets")),
             Route::Styling => assert!(html.contains("Styles and themes")),
@@ -168,7 +169,7 @@ fn chinese_pages_render_translated_content_links_and_metadata() {
     assert!(home.contains("每一种界面。"));
     assert!(home.contains("点击次数："));
     let sitemap = metadata::sitemap();
-    assert_eq!(sitemap.matches("<url>").count(), 22);
+    assert_eq!(sitemap.matches("<url>").count(), Route::ALL.len() * Locale::ALL.len());
     assert!(!sitemap.contains("404.html"));
 }
 

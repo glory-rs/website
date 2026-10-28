@@ -28,6 +28,9 @@ const plain = text => text.replace(/[\u2068\u2069]/g, '');
     await page.waitForFunction(() => window.gloryReady === true);
     await page.getByRole('heading', { name: 'One language. Every interface.' }).waitFor();
     check('SSR home hydrates');
+    assert.ok((await page.locator('.hero-facts').textContent()).includes('Optional XML DSL'));
+    assert.equal(await page.locator('.intro a[href="/docs/display/"]').count(), 1);
+
 
     const counter = page.locator('.counter-label').first();
     await assert.equal(plain(await counter.textContent()), 'Clicks: 0');
@@ -56,9 +59,9 @@ const plain = text => text.replace(/[\u2068\u2069]/g, '');
       const globalNav = page.locator('.desktop-nav');
       assert.equal(await globalNav.getByRole('link').count(), 3);
       assert.equal(await globalNav.getByRole('link', { name: 'Sapid ↗', exact: true }).getAttribute('href'), 'https://sapid.taidge.org/');
-      assert.equal(await globalNav.locator('a[href="https://github.com/glory-rs/glory/tree/f710ea096b8cab932e876093f34e90e259197141/crates"]').count(), 1);
+      assert.equal(await globalNav.locator('a[href="https://github.com/glory-rs/glory/tree/3c0c6576a38ddbd48211012f2a60ecaa7140816e/crates"]').count(), 1);
       const chapters = await page.locator(`.docs-sidebar a[href^="${prefix}/docs/"]`).evaluateAll(links => links.map(link => link.getAttribute('href')));
-      assert.equal(chapters.length, 10);
+      assert.equal(chapters.length, 11);
       for (const href of chapters) {
         await page.locator(`.docs-sidebar a[href="${href}"]`).click();
         await page.waitForURL(`${base}${href}`);
@@ -149,7 +152,7 @@ const plain = text => text.replace(/[\u2068\u2069]/g, '');
     for (const width of [1280, 768, 390, 320]) {
       await page.setViewportSize({ width, height: 800 });
       for (const prefix of ['', '/zh']) {
-        for (const chapter of ['/', '/docs/', '/docs/architecture/', '/docs/reactivity/', '/docs/widgets/', '/docs/custom-widgets/', '/docs/styling/', '/docs/i18n/', '/docs/web/', '/docs/ssr/', '/docs/platforms/']) {
+        for (const chapter of ['/', '/docs/', '/docs/architecture/', '/docs/reactivity/', '/docs/display/', '/docs/widgets/', '/docs/custom-widgets/', '/docs/styling/', '/docs/i18n/', '/docs/web/', '/docs/ssr/', '/docs/platforms/']) {
           const path = prefix + chapter;
           await page.goto(`${base}${path}`);
           await page.waitForFunction(() => window.gloryReady === true);
@@ -272,8 +275,30 @@ const plain = text => text.replace(/[\u2068\u2069]/g, '');
     }
     const xml = await context.request.get(`${base}/sitemap.xml`);
     assert.equal(xml.status(), 200);
-    assert.equal((await xml.text()).match(/<url>/g).length, 22);
+    assert.equal((await xml.text()).match(/<url>/g).length, 24);
     check('Chinese no-JS SSR, localized real 404 responses and bilingual sitemap');
+    const displayStaticContext = await browser.newContext({ javaScriptEnabled: false });
+    for (const [prefix, title, boundary] of [
+      ['', 'XML DSL and display templates', 'Current display support'],
+      ['/zh', 'XML DSL 与显示模板', '当前 display 支持范围'],
+    ]) {
+      await page.goto(`${base}${prefix}/docs/display/`);
+      await page.waitForFunction(() => window.gloryReady === true);
+      await page.getByRole('heading', { name: title, exact: true }).waitFor();
+      assert.ok((await page.locator('.docs-article').textContent()).includes('#[component]'));
+      assert.ok((await page.locator('.docs-article').textContent()).includes('KeyedList'));
+      await page.getByRole('button', { name: prefix ? '复制代码' : 'Copy code', exact: true }).nth(1).click();
+      await page.waitForFunction(() => navigator.clipboard.readText().then(text => text.includes('App::launch::<Counter>')));
+      const staticDisplay = await displayStaticContext.newPage();
+      await staticDisplay.goto(`${base}${prefix}/docs/display/`);
+      await staticDisplay.getByRole('heading', { name: title, exact: true }).waitFor();
+      assert.ok((await staticDisplay.locator('.docs-article').textContent()).includes(boundary));
+      assert.ok((await staticDisplay.locator('.docs-article').textContent()).includes('SSR/hydration'));
+      await staticDisplay.close();
+    }
+    await displayStaticContext.close();
+    check('XML display guide in both languages: hydration, source copy and no-JS support boundaries');
+
 
     await page.setViewportSize({ width: 1280, height: 900 });
     await page.goto(`${base}/docs/`);

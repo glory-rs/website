@@ -178,6 +178,16 @@ pub fn ssr(locale: Locale) -> impl Widget {
             "docs-lead",
             locale.text("ssr-render-useful-html-on-the-server-then-let-the"),
         )),
+        Box::new(view().class("docs-callout").fill((
+            copy("docs-callout-title", locale.text("display-widget-guide-title")),
+            copy("", locale.text("display-widget-guide-body")),
+            crate::components::link(
+                locale,
+                locale.text("display-home-link"),
+                Route::Display,
+                "text-link",
+            ),
+        ))),
         Box::new(heading(2, "docs-heading", locale.text("ssr-start-with-ordinary-html"))),
         Box::new(copy(
             "docs-paragraph",

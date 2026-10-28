@@ -104,7 +104,7 @@ pub fn home(locale: Locale) -> impl Widget {
                         link(locale, locale.text("home-design-principles"), Route::Architecture, "button button-secondary"),
                     )),
                     view().class("hero-facts").fill((
-                        copy("", locale.text("home-no-ui-dsl")),
+                        copy("", locale.text("home-optional-xml-dsl")),
                         copy("fact-dot", "·"),
                         copy("", locale.text("home-no-virtual-dom")),
                         copy("fact-dot", "·"),
@@ -129,7 +129,8 @@ pub fn home(locale: Locale) -> impl Widget {
                 ),
             )),
             view().class("feature-list").fill((
-                feature(locale.text("home-describe-interfaces-with-handwritten-rust-builders-not-a-template")),
+                feature(locale.text("home-choose-xml-or-handwritten-templates")),
+                link(locale, locale.text("display-home-link"), Route::Display, "text-link"),
                 feature(locale.text("home-build-once-then-send-typed-patches-instead-of-diffing")),
                 feature(locale.text("home-keep-state-and-subscriptions-attached-to-an-explicit-owner")),
                 feature(locale.text("home-share-widgets-across-web-ssr-and-native-rendering-hosts")),

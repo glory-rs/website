@@ -20,6 +20,7 @@ pub fn counter() -> impl Widget {
 
 const FEATURES: &str = r#"[features]
 default = []
+dsl = ["glory/dsl"]
 web = ["glory/web"]
 ssr = ["glory/ssr"]
 hydrate = ["glory/hydrate"]
@@ -30,7 +31,7 @@ desktop = ["glory/blitz-shell"]
 desktop-accessibility = ["glory/blitz-accesskit"]
 
 [dependencies]
-glory = { git = "https://github.com/glory-rs/glory", rev = "f710ea096b8cab932e876093f34e90e259197141", default-features = false }"#;
+glory = { git = "https://github.com/glory-rs/glory", rev = "3c0c6576a38ddbd48211012f2a60ecaa7140816e", default-features = false }"#;
 
 const WEB_AND_SSR: &str = r#"// Native server: produce a versioned fragment for an otherwise empty mount.
 let snapshot = glory::ssr::snapshot(counter())?;
@@ -70,6 +71,11 @@ pub fn platforms(locale: Locale) -> impl Widget {
             "docs-lead",
             locale.text("platforms-keep-application-components-in-terms-of-widget-scope-semantic"),
         )),
+        Box::new(view().class("docs-callout").fill((
+            copy("docs-callout-title", locale.text("display-widget-guide-title")),
+            copy("", locale.text("display-widget-guide-body")),
+            crate::components::link(locale, locale.text("display-home-link"), Route::Display, "text-link"),
+        ))),
         Box::new(heading(2, "docs-heading", locale.text("platforms-write-the-shared-component-once"))),
         Box::new(copy(
             "docs-paragraph",
@@ -103,6 +109,9 @@ pub fn platforms(locale: Locale) -> impl Widget {
             view().class("docs-host-card").fill((heading(3, "docs-card-title", locale.text("platforms-blitz-document-blitz")), copy("", locale.text("platforms-native-headless-css-box-text-layout-measurement-and-programmatic")))),
             view().class("docs-host-card").fill((heading(3, "docs-card-title", locale.text("platforms-blitz-desktop-blitz-shell")), copy("", locale.text("platforms-windowapp-and-shell-add-cpu-desktop-windows-activation-focus")))),
         ))),
+        Box::new(heading(2, "docs-heading", locale.text("platforms-mobile-title"))),
+        Box::new(copy("docs-paragraph", locale.text("platforms-mobile-body"))),
+        Box::new(external(locale.text("platforms-mobile-link"), "https://github.com/glory-rs/glory/blob/3c0c6576a38ddbd48211012f2a60ecaa7140816e/examples/mobile/README.md", "text-link")),
         Box::new(view().class("docs-callout").fill((
             copy("docs-callout-title", locale.text("platforms-sharing-semantics-does-not-erase-platform-differences")),
             copy("", locale.text("platforms-cross-platform-widgets-do-not-guarantee-pixel-identical-output")),

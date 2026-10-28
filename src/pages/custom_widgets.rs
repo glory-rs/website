@@ -110,6 +110,11 @@ pub fn custom_widgets(locale: Locale) -> impl Widget {
             "docs-lead",
             locale.text("custom-widgets-implementing-widget-gives-a-reusable-rust-value-its-own"),
         )),
+        Box::new(view().class("docs-callout").fill((
+            copy("docs-callout-title", locale.text("display-widget-guide-title")),
+            copy("", locale.text("display-widget-guide-body")),
+            crate::components::link(locale, locale.text("display-home-link"), Route::Display, "text-link"),
+        ))),
         Box::new(heading(2, "docs-heading", locale.text("custom-widgets-a-complete-counter"))),
         Box::new(copy(
             "docs-paragraph",

@@ -152,6 +152,16 @@ pub fn styling(locale: Locale) -> impl Widget {
             REPLACEMENT,
             "docs-code",
         )),
+        Box::new(view().class("docs-callout").fill((
+            copy("docs-callout-title", locale.text("display-widget-guide-title")),
+            copy("", locale.text("display-widget-guide-body")),
+            crate::components::link(
+                locale,
+                locale.text("display-home-link"),
+                Route::Display,
+                "text-link",
+            ),
+        ))),
         Box::new(heading(2, "docs-heading", locale.text("styling-use-classes-with-external-css"))),
         Box::new(copy(
             "docs-paragraph",

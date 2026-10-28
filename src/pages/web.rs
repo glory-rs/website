@@ -12,7 +12,7 @@ edition = "2024"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-glory = { git = "https://github.com/glory-rs/glory", rev = "f710ea096b8cab932e876093f34e90e259197141", default-features = false, features = ["web"] }
+glory = { git = "https://github.com/glory-rs/glory", rev = "3c0c6576a38ddbd48211012f2a60ecaa7140816e", default-features = false, features = ["web"] }
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 wasm-bindgen = "=0.2.129"
@@ -115,6 +115,16 @@ pub fn web(locale: Locale) -> impl Widget {
             "docs-lead",
             locale.text("web-a-glory-browser-application-is-a-wasm32-rust-library"),
         )),
+        Box::new(view().class("docs-callout").fill((
+            copy("docs-callout-title", locale.text("display-widget-guide-title")),
+            copy("", locale.text("display-widget-guide-body")),
+            crate::components::link(
+                locale,
+                locale.text("display-home-link"),
+                Route::Display,
+                "text-link",
+            ),
+        ))),
         Box::new(heading(2, "docs-heading", locale.text("web-select-the-wasm32-web-feature"))),
         Box::new(copy(
             "docs-paragraph",

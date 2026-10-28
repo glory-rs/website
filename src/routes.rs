@@ -49,6 +49,7 @@ pub enum Route {
     Docs,
     Architecture,
     Reactivity,
+    Display,
     Widgets,
     CustomWidgets,
     Styling,
@@ -60,11 +61,12 @@ pub enum Route {
 }
 
 impl Route {
-    pub const ALL: [Route; 11] = [
+    pub const ALL: [Route; 12] = [
         Route::Home,
         Route::Docs,
         Route::Architecture,
         Route::Reactivity,
+        Route::Display,
         Route::Widgets,
         Route::CustomWidgets,
         Route::Styling,
@@ -82,6 +84,7 @@ impl Route {
             "/docs" | "/docs/index.html" => Self::Docs,
             "/docs/architecture" | "/docs/architecture/index.html" => Self::Architecture,
             "/docs/reactivity" | "/docs/reactivity/index.html" => Self::Reactivity,
+            "/docs/display" | "/docs/display/index.html" => Self::Display,
             "/docs/widgets" | "/docs/widgets/index.html" => Self::Widgets,
             "/docs/custom-widgets" | "/docs/custom-widgets/index.html" => Self::CustomWidgets,
             "/docs/styling" | "/docs/styling/index.html" => Self::Styling,
@@ -99,6 +102,7 @@ impl Route {
             Self::Docs => "/docs/",
             Self::Architecture => "/docs/architecture/",
             Self::Reactivity => "/docs/reactivity/",
+            Self::Display => "/docs/display/",
             Self::Widgets => "/docs/widgets/",
             Self::CustomWidgets => "/docs/custom-widgets/",
             Self::Styling => "/docs/styling/",
@@ -116,6 +120,7 @@ impl Route {
             Self::Docs => locale.text("meta-get-started-glory"),
             Self::Architecture => locale.text("meta-architecture-and-design-glory"),
             Self::Reactivity => locale.text("meta-fine-grained-reactivity-glory"),
+            Self::Display => locale.text("display-meta-title"),
             Self::Widgets => locale.text("meta-built-in-widgets-glory"),
             Self::CustomWidgets => locale.text("meta-writing-custom-widgets-glory"),
             Self::Styling => locale.text("meta-styling-and-assets-glory"),
@@ -139,8 +144,9 @@ impl Route {
                 locale.text("meta-understand-glory-s-retained-semantic-tree-typed-patches-explicit")
             }
             Self::Reactivity => {
-                locale.text("meta-owned-cage-bond-and-lotus-values-provide-explicit-fine")
+                locale.text("meta-owned-cage-bond-and-vary-values-provide-explicit-fine")
             }
+            Self::Display => locale.text("display-meta-description"),
             Self::Widgets => {
                 locale.text("meta-compose-interfaces-with-glory-s-built-in-semantic-elements")
             }

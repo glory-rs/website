@@ -5,7 +5,7 @@ use glory::prelude::*;
 use glory::render::{Current, Role};
 use sapid::Theme;
 
-pub fn copy(class: &str, content: impl Into<Lotus<String>>) -> impl Widget {
+pub fn copy(class: &str, content: impl Into<Vary<String>>) -> impl Widget {
     sapid::text().unstyled().class(class.to_owned()).content(content)
 }
 
@@ -126,7 +126,7 @@ pub fn header(locale: Locale, current: Route) -> impl Widget {
                         .class("desktop-nav")
                         .fill(primary_links(locale, current, false)),
                     view().class("header-actions").fill((
-                        copy("version", "v0.3.1"),
+                        copy("version", "main · 3c0c657"),
                         external("GitHub", "https://github.com/glory-rs/glory", "github-link"),
                         language_picker(locale, current),
                         sapid::button()

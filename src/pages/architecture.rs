@@ -78,6 +78,11 @@ pub fn architecture(locale: Locale) -> impl Widget {
             "docs-lead",
             locale.text("architecture-glory-retains-a-typed-semantic-tree-builds-each-mounted"),
         )),
+        Box::new(view().class("docs-callout").fill((
+            copy("docs-callout-title", locale.text("display-layers-title")),
+            copy("", locale.text("display-layers-body")),
+            crate::components::link(locale, locale.text("display-home-link"), Route::Display, "text-link"),
+        ))),
         Box::new(heading(2, "docs-heading", locale.text("architecture-a-retained-tree-not-a-virtual-dom"))),
         Box::new(copy(
             "docs-paragraph",
@@ -138,7 +143,7 @@ pub fn architecture(locale: Locale) -> impl Widget {
             "docs-paragraph",
             locale.text("architecture-ownership-also-explains-independent-component-state-two-mounts-of"),
         )),
-        Box::new(link(locale, locale.text("architecture-review-cage-bond-and-lotus-ownership"), Route::Reactivity, "text-link")),
+        Box::new(link(locale, locale.text("architecture-review-cage-bond-and-vary-ownership"), Route::Reactivity, "text-link")),
         Box::new(heading(2, "docs-heading", locale.text("architecture-one-semantic-model-replaceable-hosts"))),
         Box::new(copy(
             "docs-paragraph",

@@ -21,7 +21,7 @@ pub fn reactivity(locale: Locale) -> impl Widget {
         Box::new(heading(1, "docs-title", locale.text("reactivity-fine-grained-reactivity"))),
         Box::new(copy(
             "docs-lead",
-            locale.text("reactivity-cage-bond-and-lotus-make-data-flow-explicit-values"),
+            locale.text("reactivity-cage-bond-and-vary-make-data-flow-explicit-values"),
         )),
         Box::new(view().class("reactive-concepts").fill((
             view().class("concept-card").fill((
@@ -44,8 +44,8 @@ pub fn reactivity(locale: Locale) -> impl Widget {
             )),
             view().class("concept-card").fill(
                 (
-                    copy("concept-symbol", "L"),
-                    heading(2, "concept-title", "Lotus"),
+                    copy("concept-symbol", "V"),
+                    heading(2, "concept-title", "Vary"),
                     copy(
                         "",
                         locale.text(
@@ -86,7 +86,7 @@ pub fn reactivity(locale: Locale) -> impl Widget {
             "docs-paragraph",
             locale.text("reactivity-dropping-a-scope-invalidates-its-handles-and-cancels-owned"),
         )),
-        Box::new(doc_nav(locale, Some(Route::Architecture), Some(Route::Widgets))),
+        Box::new(doc_nav(locale, Some(Route::Architecture), Some(Route::Display))),
     ];
     docs_layout(locale, Route::Reactivity, view().fill(content))
 }

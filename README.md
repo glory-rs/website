@@ -1,22 +1,23 @@
 # Glory website
 
-The official Glory learning site, built with Glory semantic widgets and Sapid. The site uses synchronous static generation and WebAssembly hydration; page UI and behavior are handwritten Rust.
+The official Glory learning site, built with Glory semantic widgets and Sapid. The site uses synchronous static generation and WebAssembly hydration; page UI and behavior use the semantic Widget API in Rust. The documented XML display examples compile against the same pinned main revision.
 
-The content focuses on Glory itself: its design principles, built-in semantic widgets, custom Widget implementations, reactivity, styling, WebAssembly, SSR, hydration, and cross-platform hosts.
+The content follows Glory main at `3c0c657` (2026-10-29): its HTML/CSS display contract, optional XML DSL, shared templates, built-in semantic widgets, custom Widget implementations, reactivity, styling, WebAssembly, SSR, hydration, and cross-platform hosts.
 
 ## Pages
 
 - `/` — design overview, live Glory counter, host model, and learning paths
 - `/docs/` — introduction, installation, first application, and reading guide
 - `/docs/architecture/` — retained semantics, typed patches, Owners, and hosts
-- `/docs/reactivity/` — Cage, Bond, Lotus, and live examples
+- `/docs/reactivity/` — Cage, Bond, Vary, and live examples
+- `/docs/display/` — XML DSL, shared templates, components, keyed rows, and current browser-only boundaries
 - `/docs/widgets/` — Glory's built-in elements, control flow, and lists
 - `/docs/custom-widgets/` — implementing the Widget trait in Rust
 - `/docs/styling/` — typed styles, external CSS, and bounded stylesheets
 - `/docs/i18n/` — Fluent catalogs, language switching, parameters/plurals, and SSR hydration
 - `/docs/web/` — WebAssembly launch and browser host lifecycle
 - `/docs/ssr/` — HTML, snapshots, hydration, resources, and streaming
-- `/docs/platforms/` — Web, SSR, and Blitz desktop capabilities and boundaries
+- `/docs/platforms/` — Web, SSR, Blitz desktop, and Android/iOS capabilities and boundaries
 - `/404.html` — rendered not-found page
 
 The current checkout uses sibling path dependencies on `../glory` and `../sapid`.
@@ -61,7 +62,7 @@ and code examples are shared Rust. Add matching message IDs and variable names
 in both resources. Native tests reject incomplete resources and resolve every
 message, including the live counter's parameterized label.
 
-Static generation emits 22 localized content pages, English and Chinese 404
+Static generation emits 24 localized content pages, English and Chinese 404
 documents, language alternates, canonical URLs, `sitemap.xml` and `robots.txt`.
 Client navigation updates the same document metadata. Cloudflare Pages selects
 the nearest ancestor 404; keep both `/404.html` and `/zh/404.html` in the artifact.
@@ -125,3 +126,17 @@ Build artifacts, Cargo target files, temporary files, and reports stay under `D:
 - `src/bin/generate.rs` — static HTML generation from Glory SSR snapshots
 - `styles/site.css` — site design and responsive layout
 - `tests/` — semantic/native and Chromium acceptance
+
+## Display and semantic APIs
+
+The optional `glory/dsl` feature adds `view!`, `template!`, `field!` and
+`#[component]`; handwritten display templates need only `web`. Both use the same
+sparse browser host. Raw HTML does not instantiate a semantic Widget per element.
+Direct display currently supports browser CSR; its SSR/hydration, Blitz and
+controlled-input migrations remain pending. Semantic widgets retain their
+Web/SSR/native capabilities. Both layers use Cage/Bond/Vary and core ownership.
+Do not import both preludes into the same namespace.
+
+`src/examples/display_*.rs` are the actual source of the displayed guide snippets
+and compile on native and wasm32. The website enables `dsl` to check these
+examples; its pages continue to render/hydrate through semantic widgets and Sapid.

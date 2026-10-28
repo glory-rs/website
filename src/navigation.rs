@@ -2,7 +2,7 @@ use crate::Route;
 
 pub const SAPID_URL: &str = "https://sapid.taidge.org/";
 pub const API_URL: &str =
-    "https://github.com/glory-rs/glory/tree/f710ea096b8cab932e876093f34e90e259197141/crates";
+    "https://github.com/glory-rs/glory/tree/3c0c6576a38ddbd48211012f2a60ecaa7140816e/crates";
 
 pub struct Chapter {
     pub route: Route,
@@ -35,6 +35,7 @@ pub const DOC_GROUPS: &[DocGroup] = &[
         title: "navigation-building-interfaces",
         description: "navigation-building-description",
         chapters: &[
+            Chapter { route: Route::Display, label: "display-nav" },
             Chapter { route: Route::Widgets, label: "common-built-in-widgets" },
             Chapter { route: Route::CustomWidgets, label: "common-custom-widgets" },
             Chapter { route: Route::Styling, label: "common-styling" },
