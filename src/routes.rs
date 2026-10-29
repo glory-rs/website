@@ -163,7 +163,7 @@ impl Route {
             Self::Ssr => locale
                 .text("meta-render-static-html-create-hydration-snapshots-transfer-resources-and"),
             Self::Platforms => {
-                locale.text("meta-share-glory-widgets-across-web-ssr-and-blitz-desktop")
+                locale.text("meta-share-glory-widgets-across-web-ssr-and-apace-desktop")
             }
             Self::NotFound => {
                 locale.text("meta-the-requested-glory-documentation-page-could-not-be-found")

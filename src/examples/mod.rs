@@ -1,6 +1,7 @@
 pub mod display_counter;
 pub mod display_label;
 pub mod display_rows;
+pub mod display_widgets;
 pub mod getting_started;
 #[cfg(target_arch = "wasm32")]
 pub mod i18n_browser;

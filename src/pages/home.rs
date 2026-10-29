@@ -176,7 +176,7 @@ pub fn home(locale: Locale) -> impl Widget {
                         copy("preview-kicker", locale.text("home-the-host-matrix")),
                         view().class("host-row").fill((copy("host-number", "01"), view().fill((heading(3, "host-title", locale.text("common-web")), copy("host-copy", locale.text("home-wasm-dom-rendering-input-geometry-and-scrolling")))))),
                         view().class("host-row").fill((copy("host-number", "02"), view().fill((heading(3, "host-title", locale.text("common-ssr")), copy("host-copy", locale.text("home-static-documents-snapshots-resources-and-optional-streaming")))))),
-                        view().class("host-row").fill((copy("host-number", "03"), view().fill((heading(3, "host-title", locale.text("home-native")), copy("host-copy", locale.text("home-blitz-layout-desktop-windows-and-accessibility-bridges")))))),
+                        view().class("host-row").fill((copy("host-number", "03"), view().fill((heading(3, "host-title", locale.text("home-native")), copy("host-copy", locale.text("home-apace-layout-desktop-windows-and-accessibility-bridges")))))),
                         link(locale, locale.text("home-understand-ssr-hydration"), Route::Ssr, "text-link"),
                     )),
                 )),
@@ -195,7 +195,7 @@ pub fn home(locale: Locale) -> impl Widget {
                 topic_card(locale, locale.text("common-architecture"), locale.text("home-trace-a-cage-revision-through-derived-values-semantic-patches"), Route::Architecture, locale.text("home-read-the-design")),
                 topic_card(locale, locale.text("common-custom-widgets"), locale.text("home-implement-the-widget-trait-compose-children-handle-events-and"), Route::CustomWidgets, locale.text("home-write-a-widget")),
                 topic_card(locale, locale.text("common-ssr-hydration"), locale.text("home-choose-between-static-html-snapshots-resource-transfer-and-streaming"), Route::Ssr, locale.text("home-render-on-the-server")),
-                topic_card(locale, locale.text("home-cross-platform"), locale.text("home-share-one-widget-across-web-ssr-and-blitz-while"), Route::Platforms, locale.text("home-compare-hosts")),
+                topic_card(locale, locale.text("home-cross-platform"), locale.text("home-share-one-widget-across-web-ssr-and-apace-while"), Route::Platforms, locale.text("home-compare-hosts")),
             )),
             view().class("cta").fill((
                 copy("eyebrow", locale.text("home-start-with-the-model")),

@@ -26,12 +26,12 @@ ssr = ["glory/ssr"]
 hydrate = ["glory/hydrate"]
 stream = ["glory/stream"]
 stream-web = ["glory/stream", "glory/hydrate"]
-blitz = ["glory/blitz"]
-desktop = ["glory/blitz-shell"]
-desktop-accessibility = ["glory/blitz-accesskit"]
+apace = ["glory/apace"]
+desktop = ["glory/apace-shell"]
+desktop-accessibility = ["glory/apace-accesskit"]
 
 [dependencies]
-glory = { git = "https://github.com/glory-rs/glory", rev = "3c0c6576a38ddbd48211012f2a60ecaa7140816e", default-features = false }"#;
+glory = { version = "=0.6.0", default-features = false }"#;
 
 const WEB_AND_SSR: &str = r#"// Native server: produce a versioned fragment for an otherwise empty mount.
 let snapshot = glory::ssr::snapshot(counter())?;
@@ -46,7 +46,7 @@ let app = glory::web::hydrate(hydration_root, counter())?;"#;
 
 const DESKTOP: &str = r#"#[cfg(any(target_os = "windows", target_os = "linux", target_os = "macos"))]
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    use glory::blitz::shell::{Shell, WindowApp, WindowAttributes};
+    use glory::apace::shell::{Shell, WindowApp, WindowAttributes};
 
     let app = WindowApp::new();
     app.mount(counter())?;
@@ -106,12 +106,12 @@ pub fn platforms(locale: Locale) -> impl Widget {
             view().class("docs-host-card").fill((heading(3, "docs-card-title", locale.text("platforms-ssr-ssr")), copy("", locale.text("platforms-native-synchronous-html-strings-documents-and-versioned-snapshots-through")))),
             view().class("docs-host-card").fill((heading(3, "docs-card-title", locale.text("platforms-hydration-hydrate")), copy("", locale.text("platforms-browser-adoption-of-a-compatible-ssr-snapshot-through-hydrate")))),
             view().class("docs-host-card").fill((heading(3, "docs-card-title", locale.text("platforms-streaming-stream")), copy("", locale.text("platforms-native-pull-driven-shell-patch-end-output-with-request")))),
-            view().class("docs-host-card").fill((heading(3, "docs-card-title", locale.text("platforms-blitz-document-blitz")), copy("", locale.text("platforms-native-headless-css-box-text-layout-measurement-and-programmatic")))),
-            view().class("docs-host-card").fill((heading(3, "docs-card-title", locale.text("platforms-blitz-desktop-blitz-shell")), copy("", locale.text("platforms-windowapp-and-shell-add-cpu-desktop-windows-activation-focus")))),
+            view().class("docs-host-card").fill((heading(3, "docs-card-title", locale.text("platforms-apace-document-apace")), copy("", locale.text("platforms-native-headless-css-box-text-layout-measurement-and-programmatic")))),
+            view().class("docs-host-card").fill((heading(3, "docs-card-title", locale.text("platforms-apace-desktop-apace-shell")), copy("", locale.text("platforms-windowapp-and-shell-add-cpu-desktop-windows-activation-focus")))),
         ))),
         Box::new(heading(2, "docs-heading", locale.text("platforms-mobile-title"))),
         Box::new(copy("docs-paragraph", locale.text("platforms-mobile-body"))),
-        Box::new(external(locale.text("platforms-mobile-link"), "https://github.com/glory-rs/glory/blob/3c0c6576a38ddbd48211012f2a60ecaa7140816e/examples/mobile/README.md", "text-link")),
+        Box::new(external(locale.text("platforms-mobile-link"), "https://github.com/glory-rs/glory/blob/v0.6.0/examples/mobile/README.md", "text-link")),
         Box::new(view().class("docs-callout").fill((
             copy("docs-callout-title", locale.text("platforms-sharing-semantics-does-not-erase-platform-differences")),
             copy("", locale.text("platforms-cross-platform-widgets-do-not-guarantee-pixel-identical-output")),

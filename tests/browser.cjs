@@ -13,7 +13,7 @@ const plain = text => text.replace(/[\u2068\u2069]/g, '');
   const report = { base, checks: [], errors: [] };
   const check = (name) => { report.checks.push(name); console.log(`PASS ${name}`); };
   try {
-    browser = await chromium.launch({ headless: true });
+    browser = await chromium.launch({ headless: true, ...(process.env.GLORY_CHROME ? { executablePath: process.env.GLORY_CHROME } : {}) });
     const context = await browser.newContext({ permissions: ['clipboard-read', 'clipboard-write'] });
     const page = await context.newPage();
     const chooseLanguage = async (name) => {
@@ -59,7 +59,7 @@ const plain = text => text.replace(/[\u2068\u2069]/g, '');
       const globalNav = page.locator('.desktop-nav');
       assert.equal(await globalNav.getByRole('link').count(), 3);
       assert.equal(await globalNav.getByRole('link', { name: 'Sapid ↗', exact: true }).getAttribute('href'), 'https://sapid.taidge.org/');
-      assert.equal(await globalNav.locator('a[href="https://github.com/glory-rs/glory/tree/3c0c6576a38ddbd48211012f2a60ecaa7140816e/crates"]').count(), 1);
+      assert.equal(await globalNav.locator('a[href="https://github.com/glory-rs/glory/tree/v0.6.0/crates"]').count(), 1);
       const chapters = await page.locator(`.docs-sidebar a[href^="${prefix}/docs/"]`).evaluateAll(links => links.map(link => link.getAttribute('href')));
       assert.equal(chapters.length, 11);
       for (const href of chapters) {
@@ -293,7 +293,8 @@ const plain = text => text.replace(/[\u2068\u2069]/g, '');
       await staticDisplay.goto(`${base}${prefix}/docs/display/`);
       await staticDisplay.getByRole('heading', { name: title, exact: true }).waitFor();
       assert.ok((await staticDisplay.locator('.docs-article').textContent()).includes(boundary));
-      assert.ok((await staticDisplay.locator('.docs-article').textContent()).includes('SSR/hydration'));
+      const displayText = await staticDisplay.locator('.docs-article').textContent();
+      assert.ok(displayText.includes('SSR') && displayText.includes(prefix ? '水合' : 'hydration'));
       await staticDisplay.close();
     }
     await displayStaticContext.close();

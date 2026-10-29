@@ -2,7 +2,7 @@ use crate::Route;
 
 pub const SAPID_URL: &str = "https://sapid.taidge.org/";
 pub const API_URL: &str =
-    "https://github.com/glory-rs/glory/tree/3c0c6576a38ddbd48211012f2a60ecaa7140816e/crates";
+    "https://github.com/glory-rs/glory/tree/v0.6.0/crates";
 
 pub struct Chapter {
     pub route: Route,

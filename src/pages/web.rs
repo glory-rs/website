@@ -12,7 +12,7 @@ edition = "2024"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-glory = { git = "https://github.com/glory-rs/glory", rev = "3c0c6576a38ddbd48211012f2a60ecaa7140816e", default-features = false, features = ["web"] }
+glory = { version = "=0.6.0", default-features = false, features = ["web"] }
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 wasm-bindgen = "=0.2.129"

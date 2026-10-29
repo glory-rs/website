@@ -7,7 +7,7 @@ const INSTALL: &str = r#"[lib]
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-glory = { git = "https://github.com/glory-rs/glory", rev = "3c0c6576a38ddbd48211012f2a60ecaa7140816e", default-features = false, features = ["web"] }
+glory = { version = "=0.6.0", default-features = false, features = ["web"] }
 
 # Add hosts only when your application needs them:
 # features = ["web", "ssr", "hydrate"]"#;
@@ -113,7 +113,7 @@ pub fn docs(locale: Locale) -> impl Widget {
             )),
             view().class("docs-host-card").fill((
                 heading(3, "docs-card-title", locale.text("docs-render")),
-                copy("", locale.text("docs-let-web-ssr-or-blitz-interpret-the-same-semantic")),
+                copy("", locale.text("docs-let-web-ssr-or-apace-interpret-the-same-semantic")),
             )),
         ))),
         Box::new(doc_nav(locale, None, Some(Route::Architecture))),

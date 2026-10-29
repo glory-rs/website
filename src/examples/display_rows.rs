@@ -25,3 +25,15 @@ pub fn rows(scope: &Scope) -> impl Widget {
         </div>
     }
 }
+
+pub fn vector_rows(scope: &Scope) -> impl Widget {
+    let values = glory::Vary::from(scope.cage(vec![(1_usize, String::from("First"))]));
+    view! {
+        <div>
+            <Each each={values} key={|item| item.0} children={|row| {
+                let label = row.field("label", |item| &item.1, |item| &mut item.1);
+                view! { <span>{label}{row.index}</span> }
+            }}/>
+        </div>
+    }
+}

@@ -3,7 +3,7 @@ use glory::prelude::*;
 use sapid::Theme;
 
 const INSTALL: &str = r#"[dependencies]
-glory = { git = "https://github.com/glory-rs/glory", rev = "3c0c6576a38ddbd48211012f2a60ecaa7140816e", default-features = false, features = ["dsl"] }
+glory = { version = "=0.6.0", default-features = false, features = ["dsl"] }
 
 # dsl includes web and the optional XML compiler.
 # Handwritten display templates only need features = ["web"]."#;
@@ -30,6 +30,13 @@ pub fn display(locale: Locale) -> impl Widget {
         )),
         Box::new(copy("docs-paragraph", locale.text("display-bindings-body"))),
         Box::new(copy("docs-paragraph", locale.text("display-start-body"))),
+        Box::new(code_panel(
+            locale,
+            Theme::blue_dark(),
+            "display_widgets.rs",
+            include_str!("../examples/display_widgets.rs"),
+            "docs-code",
+        )),
         Box::new(heading(2, "docs-heading", locale.text("display-handwritten-title"))),
         Box::new(code_panel(locale, Theme::blue_dark(), "label.rs", HANDWRITTEN, "docs-code")),
         Box::new(copy("docs-paragraph", locale.text("display-handwritten-body"))),

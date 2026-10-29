@@ -126,7 +126,7 @@ pub fn header(locale: Locale, current: Route) -> impl Widget {
                         .class("desktop-nav")
                         .fill(primary_links(locale, current, false)),
                     view().class("header-actions").fill((
-                        copy("version", "main · 3c0c657"),
+                        copy("version", "v0.6.0"),
                         external("GitHub", "https://github.com/glory-rs/glory", "github-link"),
                         language_picker(locale, current),
                         sapid::button()

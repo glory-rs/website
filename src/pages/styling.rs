@@ -113,8 +113,8 @@ fn accepted_by_host(app: &glory::App, style: &Style) -> bool {
 }
 
 // App::memory() records typed declarations with Profile::RECORD, but does no layout.
-// HTML hosts use Profile::HTML. Blitz exposes its current native profile as
-// glory::blitz::STYLE_PROFILE when the blitz feature is enabled."#;
+// HTML hosts use Profile::HTML. Apace exposes its current native profile as
+// glory::apace::STYLE_PROFILE when the apace feature is enabled."#;
 
 pub fn styling(locale: Locale) -> impl Widget {
     let content: Vec<Box<dyn Widget>> = vec![

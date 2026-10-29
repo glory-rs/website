@@ -1,8 +1,8 @@
 # Glory website
 
-The official Glory learning site, built with Glory semantic widgets and Sapid. The site uses synchronous static generation and WebAssembly hydration; page UI and behavior use the semantic Widget API in Rust. The documented XML display examples compile against the same pinned main revision.
+The official Glory learning site, built with Glory semantic widgets and Sapid. The site uses synchronous static generation and WebAssembly hydration; page UI and behavior use the semantic Widget API in Rust. The documented XML display examples compile against the same pinned release source.
 
-The content follows Glory main at `3c0c657` (2026-10-29): its HTML/CSS display contract, optional XML DSL, shared templates, built-in semantic widgets, custom Widget implementations, reactivity, styling, WebAssembly, SSR, hydration, and cross-platform hosts.
+The content follows Glory 0.6.0: its HTML/CSS display contract, optional XML DSL, shared templates, built-in semantic widgets, custom Widget implementations, reactivity, styling, WebAssembly, SSR, hydration, and cross-platform hosts.
 
 ## Pages
 
@@ -10,14 +10,14 @@ The content follows Glory main at `3c0c657` (2026-10-29): its HTML/CSS display c
 - `/docs/` — introduction, installation, first application, and reading guide
 - `/docs/architecture/` — retained semantics, typed patches, Owners, and hosts
 - `/docs/reactivity/` — Cage, Bond, Vary, and live examples
-- `/docs/display/` — XML DSL, shared templates, components, keyed rows, and current browser-only boundaries
+- `/docs/display/` — XML DSL, shared templates, Widgets, keyed rows, mixed SSR/hydration and native host boundaries
 - `/docs/widgets/` — Glory's built-in elements, control flow, and lists
 - `/docs/custom-widgets/` — implementing the Widget trait in Rust
 - `/docs/styling/` — typed styles, external CSS, and bounded stylesheets
 - `/docs/i18n/` — Fluent catalogs, language switching, parameters/plurals, and SSR hydration
 - `/docs/web/` — WebAssembly launch and browser host lifecycle
 - `/docs/ssr/` — HTML, snapshots, hydration, resources, and streaming
-- `/docs/platforms/` — Web, SSR, Blitz desktop, and Android/iOS capabilities and boundaries
+- `/docs/platforms/` — Web, SSR, Apace desktop, and Android/iOS capabilities and boundaries
 - `/404.html` — rendered not-found page
 
 The current checkout uses sibling path dependencies on `../glory` and `../sapid`.
@@ -38,9 +38,8 @@ short in both languages and put explanations in the lead. The getting-started
 snippet is compiled from `src/examples/getting_started.rs`; the Web guide
 provides the complete browser host setup.
 
-The API source link and installation example use the pinned Glory revision in
-`deploy/dependencies.json`. Keep them aligned when adopting another revision;
-the old docs.rs 0.3.1 release documents the previous architecture.
+The API source link and installation examples use the Glory 0.6.0 release.
+`deploy/dependencies.json` pins its exact source commit for reproducible site builds.
 
 `src/navigation.rs` supplies the sidebar and the documentation overview with one
 reading order: Start here, Core concepts, Building interfaces, Application
@@ -132,7 +131,7 @@ Build artifacts, Cargo target files, temporary files, and reports stay under `D:
 The optional `glory/dsl` feature adds `view!`, `template!`, `field!` and
 `#[component]`; handwritten display templates need only `web`. Both use the same
 sparse browser host. Raw HTML does not instantiate a semantic Widget per element.
-Direct display currently supports browser CSR; its SSR/hydration, Blitz and
+Direct display currently supports browser CSR; its SSR/hydration, Apace and
 controlled-input migrations remain pending. Semantic widgets retain their
 Web/SSR/native capabilities. Both layers use Cage/Bond/Vary and core ownership.
 Do not import both preludes into the same namespace.
