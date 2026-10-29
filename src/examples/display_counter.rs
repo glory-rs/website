@@ -1,7 +1,7 @@
 use glory::display::prelude::*;
 
 #[component]
-pub fn Counter(scope: &Scope, initial: usize) -> impl IntoView {
+pub fn Counter(scope: &Scope, initial: usize) -> impl Widget {
     let count = scope.cage(initial);
     view! {
         <div class="counter">
@@ -15,5 +15,5 @@ pub fn Counter(scope: &Scope, initial: usize) -> impl IntoView {
 pub fn launch() -> Result<App> {
     // The document contains an empty <main id="app"></main>.
     // Call from your wasm-bindgen start function and retain the returned App.
-    App::launch::<Counter>("app", CounterProps { initial: 0 })
+    App::launch("app", Counter::default().initial(0))
 }

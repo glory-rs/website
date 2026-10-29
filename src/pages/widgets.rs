@@ -130,7 +130,7 @@ fn results(loading: Cage<bool>, ids: Cage<Vec<u64>>) -> impl Widget {
     col().fill((
         when(loading, || text().content("Loading…"))
             .otherwise(|| text().content("Results")),
-        each(ids, |id| *id, |id, index| {
+        each(ids).key(|id| *id).children(|entry| { let (id, index) = (entry.value, entry.index);
             row().fill((
                 text().content(index.map(|index| format!("{}. ", index + 1))),
                 text().content(id.map(|id| format!("Item {id}"))),

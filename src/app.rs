@@ -55,6 +55,12 @@ pub fn app(route: impl Into<SiteRoute>) -> impl Widget {
         let state = AppState { route: scope.cage(route) };
         register(state);
         let routes = scope.bond(move || vec![state.route.get()]);
-        each(routes, |route| *route, move |route, _| page(route.get())).show_in(scope)
+        each(routes)
+            .key(|route| *route)
+            .children(move |entry| {
+                let route = entry.value;
+                page(route.get())
+            })
+            .show_in(scope)
     })
 }

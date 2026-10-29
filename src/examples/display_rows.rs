@@ -5,7 +5,7 @@ struct Item {
     label: String,
 }
 
-pub fn rows(scope: &Scope) -> impl IntoView {
+pub fn rows(scope: &Scope) -> impl Widget {
     let items = scope
         .keyed_list(vec![Item { id: 1, label: "First".into() }], |item| item.id)
         .expect("unique keys");
