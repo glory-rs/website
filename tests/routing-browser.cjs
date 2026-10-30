@@ -4,7 +4,7 @@ const { chromium } = require(process.env.GLORY_PLAYWRIGHT || 'D:/Works/glory-rs/
 const base = process.env.GLORY_WEBSITE_BASE || 'http://127.0.0.1:8796';
 process.env.TEMP = process.env.TMP = 'D:/BuildCache/glory-website/tmp';
 (async () => {
-  const browser = await chromium.launch({ headless: true, executablePath: process.env.GLORY_CHROME || 'C:/Program Files/Google/Chrome/Application/chrome.exe' });
+  const browser = await chromium.launch({ headless: true, ...(process.env.GLORY_CHROME ? { executablePath: process.env.GLORY_CHROME } : {}) });
   const report = { checks: [], errors: [] };
   try {
     const page = await browser.newPage();
