@@ -11,12 +11,7 @@ impl SiteRoute {
         Self { locale, page }
     }
     pub fn parse(path: &str) -> Self {
-        let path = path.split(['?', '#']).next().unwrap_or(path);
-        if path == "/zh" || path.starts_with("/zh/") {
-            Self::new(Locale::ZhCn, Route::parse(&path[3..]))
-        } else {
-            Self::new(Locale::En, Route::parse(path))
-        }
+        crate::routing::parse(path)
     }
     pub fn path(self) -> String {
         match self.locale {
@@ -32,7 +27,12 @@ impl SiteRoute {
     }
     /// Replace only the language/path, retaining the navigation context.
     pub fn switch_path(self, search: &str, hash: &str) -> String {
-        format!("{}{}{}", Self::new(self.locale.other(), self.page).path(), search, hash)
+        format!(
+            "{}{}{}",
+            Self::new(self.locale.other(), self.page).path(),
+            search,
+            hash
+        )
     }
 }
 
@@ -77,23 +77,7 @@ impl Route {
     ];
 
     pub fn parse(path: &str) -> Self {
-        let path = path.split(['?', '#']).next().unwrap_or(path);
-        let normalized = if path.len() > 1 { path.trim_end_matches('/') } else { path };
-        match normalized {
-            "" | "/" | "/index.html" => Self::Home,
-            "/docs" | "/docs/index.html" => Self::Docs,
-            "/docs/architecture" | "/docs/architecture/index.html" => Self::Architecture,
-            "/docs/reactivity" | "/docs/reactivity/index.html" => Self::Reactivity,
-            "/docs/display" | "/docs/display/index.html" => Self::Display,
-            "/docs/widgets" | "/docs/widgets/index.html" => Self::Widgets,
-            "/docs/custom-widgets" | "/docs/custom-widgets/index.html" => Self::CustomWidgets,
-            "/docs/styling" | "/docs/styling/index.html" => Self::Styling,
-            "/docs/i18n" | "/docs/i18n/index.html" => Self::I18n,
-            "/docs/web" | "/docs/web/index.html" => Self::Web,
-            "/docs/ssr" | "/docs/ssr/index.html" => Self::Ssr,
-            "/docs/platforms" | "/docs/platforms/index.html" => Self::Platforms,
-            _ => Self::NotFound,
-        }
+        crate::routing::parse(path).page
     }
 
     pub fn path(self) -> &'static str {

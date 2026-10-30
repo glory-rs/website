@@ -22,6 +22,20 @@ The content follows Glory 0.6.0: its HTML/CSS display contract, optional XML DSL
 
 The current checkout uses sibling path dependencies on `../glory` and `../sapid`.
 
+## Routing
+
+The application enables `glory/routing`. `src/routing.rs` declares both language
+trees and `index.html` aliases, and derives the mounted page directly from the
+Router snapshot. Query/fragment and equivalent alias changes retain the current
+chapter; language/chapter changes retire it. Unknown paths keep their URL and
+render the appropriate localized 404.
+
+Static documents include an inert routing bootstrap. Hydration adopts that
+server route before observing an address changed while WASM loaded. Glory's
+BrowserHistory owns history keys, listeners and window/fragment restoration;
+the application updates document metadata after navigation. The extra browser
+gate is `node tests/routing-browser.cjs`, also run by `scripts/build.ps1 -Browser`.
+
 ## Documentation navigation
 
 The global menu contains Docs, API source, and the [Sapid component

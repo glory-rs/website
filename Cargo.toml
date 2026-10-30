@@ -12,7 +12,7 @@ homepage = "https://glory.taidge.org"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-glory = { path = "../glory/crates/glory", version = "=0.6.0", default-features = false, features = ["web", "ssr", "hydrate", "i18n", "dsl"] }
+glory = { path = "../glory/crates/glory", version = "=0.6.0", default-features = false, features = ["web", "ssr", "hydrate", "i18n", "dsl", "routing"] }
 sapid = { path = "../sapid", version = "=0.6.0", features = ["code"] }
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]

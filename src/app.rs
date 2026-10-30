@@ -1,11 +1,6 @@
 use crate::{Route, SiteRoute, components, pages};
 use glory::prelude::*;
 
-#[derive(Clone, Copy)]
-pub struct AppState {
-    pub route: Cage<SiteRoute>,
-}
-
 pub fn request_navigation(request: sapid::AnchorRequest) {
     #[cfg(target_arch = "wasm32")]
     if let Err(error) = crate::web::navigate(&request.href) {
@@ -15,14 +10,7 @@ pub fn request_navigation(request: sapid::AnchorRequest) {
     let _ = request;
 }
 
-fn register(state: AppState) {
-    #[cfg(target_arch = "wasm32")]
-    crate::web::register(state);
-    #[cfg(not(target_arch = "wasm32"))]
-    let _ = state;
-}
-
-fn page(route: SiteRoute) -> Box<dyn Widget> {
+pub(crate) fn page(route: SiteRoute) -> Box<dyn Widget> {
     let locale = route.locale;
     let content: Box<dyn Widget> = match route.page {
         Route::Home => Box::new(pages::home(locale)),
@@ -40,27 +28,22 @@ fn page(route: SiteRoute) -> Box<dyn Widget> {
         Route::NotFound => Box::new(pages::not_found(locale)),
     };
     let theme = sapid::Theme::blue_dark();
-    let section =
-        if crate::navigation::is_documentation(route.page) { " documentation-site" } else { "" };
-    Box::new(view().class(format!("glory-site {}{section}", theme.class())).fill((
-        components::header(locale, route.page),
-        content,
-        components::footer(locale),
-    )))
+    let section = if crate::navigation::is_documentation(route.page) {
+        " documentation-site"
+    } else {
+        ""
+    };
+    Box::new(
+        view()
+            .class(format!("glory-site {}{section}", theme.class()))
+            .fill((
+                components::header(locale, route.page),
+                content,
+                components::footer(locale),
+            )),
+    )
 }
 
 pub fn app(route: impl Into<SiteRoute>) -> impl Widget {
-    let route = route.into();
-    widget(move |scope| {
-        let state = AppState { route: scope.cage(route) };
-        register(state);
-        let routes = scope.bond(move || vec![state.route.get()]);
-        each(routes)
-            .key(|route| *route)
-            .children(move |entry| {
-                let route = entry.value;
-                page(route.get())
-            })
-            .show_in(scope)
-    })
+    crate::routing::static_app(route.into())
 }

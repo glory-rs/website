@@ -1,24 +1,14 @@
-use crate::{AppState, Locale, Route, SiteRoute, metadata};
+use crate::{Locale, Route, SiteRoute, metadata};
+use glory::routing::{Bootstrap, Location, RouterHandle};
 use std::cell::RefCell;
-use wasm_bindgen::{JsValue, prelude::*};
+use wasm_bindgen::prelude::*;
 
 thread_local! {
-    static STATE: RefCell<Option<AppState>> = const { RefCell::new(None) };
-    static RUNNING: RefCell<Option<Running>> = const { RefCell::new(None) };
-}
-
-struct Running {
-    _app: glory::web::WebApp,
-    _popstate: Closure<dyn FnMut(web_sys::PopStateEvent)>,
+    static RUNNING: RefCell<Option<glory::web::routing::RoutingApp>> = const { RefCell::new(None) };
 }
 
 fn window() -> Result<web_sys::Window, String> {
     web_sys::window().ok_or_else(|| "Missing browser window".to_owned())
-}
-
-fn route(window: &web_sys::Window) -> Result<SiteRoute, String> {
-    let path = window.location().pathname().map_err(|_| "Missing URL path")?;
-    Ok(SiteRoute::parse(&path))
 }
 
 fn present(route: SiteRoute) -> Result<(), String> {
@@ -39,8 +29,16 @@ fn present(route: SiteRoute) -> Result<(), String> {
     };
     set("meta[name=description]", "content", &route.description())?;
     set("meta[property='og:title']", "content", &route.title())?;
-    set("meta[property='og:description']", "content", &route.description())?;
-    set("meta[property='og:url']", "content", &metadata::canonical(route))?;
+    set(
+        "meta[property='og:description']",
+        "content",
+        &route.description(),
+    )?;
+    set(
+        "meta[property='og:url']",
+        "content",
+        &metadata::canonical(route),
+    )?;
     set("link[rel=canonical]", "href", &metadata::canonical(route))?;
     // These belong to the outer document, outside Glory's hydrated root.
     let nodes = document
@@ -53,89 +51,112 @@ fn present(route: SiteRoute) -> Result<(), String> {
             let _ = parent.remove_child(&node);
         }
     }
-    let head =
-        document.query_selector("head").map_err(|_| "Missing head")?.ok_or("Missing head")?;
+    let head = document
+        .query_selector("head")
+        .map_err(|_| "Missing head")?
+        .ok_or("Missing head")?;
     if route.page == Route::NotFound {
-        let meta = document.create_element("meta").map_err(|_| "Could not create metadata")?;
-        meta.set_attribute("name", "robots").map_err(|_| "Could not set metadata")?;
-        meta.set_attribute("content", "noindex").map_err(|_| "Could not set metadata")?;
-        head.append_child(&meta).map_err(|_| "Could not append metadata")?;
+        let meta = document
+            .create_element("meta")
+            .map_err(|_| "Could not create metadata")?;
+        meta.set_attribute("name", "robots")
+            .map_err(|_| "Could not set metadata")?;
+        meta.set_attribute("content", "noindex")
+            .map_err(|_| "Could not set metadata")?;
+        head.append_child(&meta)
+            .map_err(|_| "Could not append metadata")?;
     } else {
-        for (tag, locale) in
-            [("en", Locale::En), ("zh-CN", Locale::ZhCn), ("x-default", Locale::En)]
-        {
-            let link = document.create_element("link").map_err(|_| "Could not create metadata")?;
+        for (tag, locale) in [
+            ("en", Locale::En),
+            ("zh-CN", Locale::ZhCn),
+            ("x-default", Locale::En),
+        ] {
+            let link = document
+                .create_element("link")
+                .map_err(|_| "Could not create metadata")?;
             for (key, value) in [
                 ("rel", "alternate"),
                 ("hreflang", tag),
-                ("href", &metadata::canonical(SiteRoute::new(locale, route.page))),
+                (
+                    "href",
+                    &metadata::canonical(SiteRoute::new(locale, route.page)),
+                ),
             ] {
-                link.set_attribute(key, value).map_err(|_| "Could not set metadata")?;
+                link.set_attribute(key, value)
+                    .map_err(|_| "Could not set metadata")?;
             }
-            head.append_child(&link).map_err(|_| "Could not append metadata")?;
+            head.append_child(&link)
+                .map_err(|_| "Could not append metadata")?;
         }
     }
-    window.scroll_to_with_x_and_y(0.0, 0.0);
     Ok(())
-}
-
-pub(crate) fn register(state: AppState) {
-    STATE.with(|slot| *slot.borrow_mut() = Some(state));
 }
 
 pub fn navigate(href: &str) -> Result<(), String> {
     let window = window()?;
-    let current = window.location().href().map_err(|_| "Missing current URL")?;
+    let current = window
+        .location()
+        .href()
+        .map_err(|_| "Missing current URL")?;
     let url = web_sys::Url::new_with_base(href, &current).map_err(|_| "Invalid link")?;
-    if url.origin() != window.location().origin().map_err(|_| "Missing URL origin")? {
+    if url.origin()
+        != window
+            .location()
+            .origin()
+            .map_err(|_| "Missing URL origin")?
+    {
         return Err("External links use native browser navigation".to_owned());
     }
-    let next = SiteRoute::parse(&url.pathname());
-    window
-        .history()
-        .map_err(|_| "Missing browser history")?
-        .push_state_with_url(&JsValue::NULL, "", Some(&url.href()))
-        .map_err(|_| "Could not update browser history")?;
-    let state = STATE.with(|slot| slot.borrow().as_ref().copied());
-    state.ok_or("Glory app is not mounted")?.route.revise(|route| *route = next);
-    present(next)
+    let target = Location::parse(&format!("{}{}{}", url.pathname(), url.search(), url.hash()))
+        .map_err(|error| error.to_string())?;
+    let router = RUNNING
+        .with(|slot| slot.borrow().as_ref().map(|app| app.router()))
+        .ok_or("Glory app is not mounted")?;
+    router.push(target).map_err(|error| error.to_string())?;
+    Ok(())
+}
+
+fn report(error: impl std::fmt::Display) {
+    web_sys::console::error_1(&error.to_string().into());
 }
 
 #[wasm_bindgen(start)]
 pub fn start() -> Result<(), JsValue> {
     let window = window().map_err(JsValue::from)?;
-    let document = window.document().ok_or_else(|| JsValue::from_str("Missing document"))?;
+    let document = window
+        .document()
+        .ok_or_else(|| JsValue::from_str("Missing document"))?;
     let root = document
         .get_element_by_id("app")
         .ok_or_else(|| JsValue::from_str("Missing #app mount element"))?;
-    let initial = route(&window).map_err(JsValue::from)?;
-    let ssr = document
-        .query_selector("meta[name=\"glory-render\"]")
-        .map_err(|_| JsValue::from_str("Invalid render metadata"))?
-        .and_then(|meta| meta.get_attribute("content"))
-        .as_deref()
-        == Some("ssr");
-    let app = if ssr {
-        glory::web::hydrate_with(root, move |_| crate::app(initial))
-            .map_err(|error| JsValue::from_str(&error.to_string()))?
-    } else {
-        glory::web::launch_with(root, move |_| crate::app(initial))
-            .map_err(|error| JsValue::from_str(&error.to_string()))?
-    };
-    let callback_window = window.clone();
-    let popstate = Closure::<dyn FnMut(web_sys::PopStateEvent)>::new(move |_| {
-        if let Ok(next) = route(&callback_window) {
-            STATE.with(|slot| {
-                if let Some(state) = slot.borrow().as_ref() {
-                    state.route.revise(|route| *route = next);
+    let definitions = crate::routing::routes();
+    let build = move |scope: &glory::Scope, router: RouterHandle| {
+        let observed = router.clone();
+        scope.effect(move || {
+            if let Ok(snapshot) = observed.snapshot() {
+                let site = crate::routing::site_route(snapshot.location(), &snapshot.plan);
+                if let Err(error) = present(site) {
+                    report(error);
                 }
-            });
-            let _ = present(next);
-        }
-    });
-    window
-        .add_event_listener_with_callback("popstate", popstate.as_ref().unchecked_ref())
-        .map_err(|_| JsValue::from_str("Could not listen for browser navigation"))?;
-    RUNNING.with(|slot| *slot.borrow_mut() = Some(Running { _app: app, _popstate: popstate }));
+            }
+        });
+        crate::routing::view(router)
+    };
+    let app = if let Some(seed) = document.get_element_by_id("glory-route-seed") {
+        let seed = Bootstrap::from_payload(&seed.text_content().unwrap_or_default())
+            .map_err(|error| JsValue::from_str(&error.to_string()))?;
+        glory::web::routing::hydrate_with(
+            root,
+            definitions,
+            &seed,
+            crate::routing::SCHEMA,
+            build,
+            report,
+        )
+    } else {
+        glory::web::routing::launch_with(root, definitions, build, report)
+    }
+    .map_err(|error| JsValue::from_str(&error.to_string()))?;
+    RUNNING.with(|slot| *slot.borrow_mut() = Some(app));
     Ok(())
 }
