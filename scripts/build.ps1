@@ -83,6 +83,8 @@ try {
         $env:GLORY_WEBSITE_BASE = 'http://127.0.0.1:8796'
         & node tests/browser.cjs
         if ($LASTEXITCODE -ne 0) { throw 'website browser acceptance failed' }
+        & node tests/routing-browser.cjs
+        if ($LASTEXITCODE -ne 0) { throw 'website routing acceptance failed' }
     }
 } finally {
     Pop-Location

@@ -47,6 +47,13 @@ pub fn document(route: SiteRoute, html: &str) -> String {
 pub fn document_with_assets(route: SiteRoute, html: &str, assets: &str) -> String {
     let icon = crate::assets::media("glory.ico");
     let logo = crate::assets::media("glory.svg");
+    let bootstrap = glory::routing::Bootstrap::new(
+        &crate::routing::routes(),
+        glory::routing::Location::parse(&route.path()).expect("static site URL"),
+        crate::routing::SCHEMA,
+    )
+    .expect("website route bootstrap")
+    .to_payload();
     format!(
         r##"<!doctype html>
 <html lang="{}">
@@ -64,6 +71,7 @@ pub fn document_with_assets(route: SiteRoute, html: &str, assets: &str) -> Strin
 </head>
 <body>
 <div id="app">{html}</div>
+<script id="glory-route-seed" type="text/plain">{bootstrap}</script>
 <script type="module">import init from '{assets}/glory_website.js'; await init(); window.gloryReady = true;</script>
 </body>
 </html>
@@ -80,7 +88,10 @@ pub fn sitemap() -> String {
     );
     for page in Route::ALL {
         for locale in Locale::ALL {
-            xml.push_str(&format!("<url><loc>{}</loc>", canonical(SiteRoute::new(locale, page))));
+            xml.push_str(&format!(
+                "<url><loc>{}</loc>",
+                canonical(SiteRoute::new(locale, page))
+            ));
             for alternate in Locale::ALL {
                 xml.push_str(&format!(
                     "<xhtml:link rel=\"alternate\" hreflang=\"{}\" href=\"{}\"/>",
