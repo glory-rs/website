@@ -25,7 +25,7 @@ env:
   npm_config_cache: D:/BuildCache/glory-website/npm
   WRANGLER_SEND_METRICS: 'false'
   RUST_VERSION: 1.98.0
-  WASM_BINDGEN_VERSION: 0.2.129
+  WASM_BINDGEN_VERSION: 0.2.130
   PLAYWRIGHT_BROWSERS_PATH: D:/BuildCache/glory-website/browsers
 
 jobs:
@@ -44,14 +44,19 @@ jobs:
           path: website
           persist-credentials: false
 
-      - name: Read pinned sibling dependencies
+      - name: Read sibling dependency sources
         id: dependencies
         run: |
           $dependencies = Get-Content deploy/dependencies.json -Raw | ConvertFrom-Json
           foreach ($name in @('glory','sapid')) {
             if ($dependencies.$name.revision -notmatch '^[a-f0-9]{40}$') { throw "Invalid revision for $name" }
             "$($name)_repository=$($dependencies.$name.repository)" >> $env:GITHUB_OUTPUT
-            "$($name)_revision=$($dependencies.$name.revision)" >> $env:GITHUB_OUTPUT
+            $sourceRef = $dependencies.$name.revision
+            if ($dependencies.$name.development_ref) {
+              if ($dependencies.$name.development_ref -ne 'main') { throw 'Unsupported development source ref' }
+              $sourceRef = 'main'
+            }
+            "$($name)_revision=$sourceRef" >> $env:GITHUB_OUTPUT
           }
 
       - name: Check out Glory
@@ -69,6 +74,13 @@ jobs:
           ref: ${{ steps.dependencies.outputs.sapid_revision }}
           path: sapid
           persist-credentials: false
+
+      - name: Check out coordinated development engines
+        shell: bash
+        run: |
+          for engine in apace takia wingy; do
+            if [ ! -d ../$engine/.git ]; then git clone --depth 1 https://github.com/glory-rs/$engine ../$engine; fi
+          done
 
       - name: Prepare D drive build directories
         run: |

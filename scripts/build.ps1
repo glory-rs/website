@@ -39,7 +39,7 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'website metadata failed' }
     if ([IO.Path]::GetFullPath($metadata.target_directory) -ne [IO.Path]::GetFullPath($env:CARGO_TARGET_DIR)) { throw "Unexpected website target: $($metadata.target_directory)" }
     Write-Output "Website target verified: $($metadata.target_directory)"
-    if ((& $Bindgen --version).Trim() -ne 'wasm-bindgen 0.2.129') { throw 'website requires wasm-bindgen-cli 0.2.129' }
+    if ((& $Bindgen --version).Trim() -ne 'wasm-bindgen 0.2.130') { throw 'website requires wasm-bindgen-cli 0.2.130' }
     $profile = if ($Release) { 'release' } else { 'debug' }
     $buildArguments = @('build','--locked','--lib','--target','wasm32-unknown-unknown')
     if ($Release) { $buildArguments += '--release' }

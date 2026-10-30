@@ -1,10 +1,12 @@
 {
   "glory": {
     "repository": "glory-rs/glory",
-    "revision": "e06bda4db278fc3d981331d6811c284c5a4559db"
+    "revision": "e06bda4db278fc3d981331d6811c284c5a4559db",
+    "development_ref": "main"
   },
   "sapid": {
     "repository": "sapid-ui/sapid",
-    "revision": "47e3cbdc9d1760115be88913941087f17746686f"
+    "revision": "47e3cbdc9d1760115be88913941087f17746686f",
+    "development_ref": "main"
   }
 }

@@ -1,5 +1,10 @@
 # Cloudflare Pages deployment
 
+The unpublished 0.6.1 development cycle uses sibling `main` sources through
+`development_ref` in dependencies.json. The previous frozen revisions remain in
+the record; remove the development override and review new immutable revisions
+before restoring a frozen deployment. Cargo.lock remains committed for this app.
+
 Pushes to `main` build and deploy through `.github/workflows/deploy.yml`.
 The workflow can also be run from GitHub Actions with **Run workflow** on `main`.
 The production website is <https://glory.taidge.org/>.
