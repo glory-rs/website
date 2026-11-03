@@ -7,7 +7,13 @@ struct Item {
 
 pub fn rows(scope: &Scope) -> impl Widget {
     let items = scope
-        .keyed_list(vec![Item { id: 1, label: "First".into() }], |item| item.id)
+        .keyed_list(
+            vec![Item {
+                id: 1,
+                label: "First".into(),
+            }],
+            |item| item.id,
+        )
         .expect("unique keys");
     let visible = scope.cage(true);
     view! {

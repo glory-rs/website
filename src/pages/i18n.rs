@@ -16,7 +16,14 @@ pub fn i18n(locale: Locale) -> impl Widget {
     let prose = |key| copy("docs-paragraph", locale.text(key));
     let title = |key| heading(2, "docs-heading", locale.text(key));
     let code = |name, source, language| {
-        source_panel(locale, Theme::blue_dark(), name, source, "docs-code", language)
+        source_panel(
+            locale,
+            Theme::blue_dark(),
+            name,
+            source,
+            "docs-code",
+            language,
+        )
     };
     let content: Vec<Box<dyn Widget>> = vec![
         Box::new(copy("docs-kicker", locale.text("i18n-kicker"))),
@@ -65,11 +72,9 @@ pub fn i18n(locale: Locale) -> impl Widget {
         ))),
         Box::new(title("i18n-demo-title")),
         Box::new(prose("i18n-demo-body")),
-        Box::new(
-            view()
-                .class("docs-playground")
-                .fill(language_demo(locale.tag().parse().expect("static language"))),
-        ),
+        Box::new(view().class("docs-playground").fill(language_demo(
+            locale.tag().parse().expect("static language"),
+        ))),
         Box::new(title("i18n-ssr-title")),
         Box::new(prose("i18n-ssr-body")),
         Box::new(code(
@@ -85,7 +90,10 @@ pub fn i18n(locale: Locale) -> impl Widget {
             CodeLanguage::Rust,
         )),
         Box::new(view().class("docs-callout").fill((
-            copy("docs-callout-title", locale.text("i18n-hydrate-warning-title")),
+            copy(
+                "docs-callout-title",
+                locale.text("i18n-hydrate-warning-title"),
+            ),
             copy("", locale.text("i18n-hydrate-warning-body")),
         ))),
         Box::new(title("i18n-policy-title")),
@@ -93,7 +101,12 @@ pub fn i18n(locale: Locale) -> impl Widget {
         Box::new(prose("i18n-validation-body")),
         Box::new(prose("i18n-text-body")),
         Box::new(prose("i18n-url-body")),
-        Box::new(link(locale, locale.text("i18n-ssr-link"), Route::Ssr, "text-link")),
+        Box::new(link(
+            locale,
+            locale.text("i18n-ssr-link"),
+            Route::Ssr,
+            "text-link",
+        )),
         Box::new(doc_nav(locale, Some(Route::Styling), Some(Route::Web))),
     ];
     docs_layout(locale, Route::I18n, view().fill(content))

@@ -172,14 +172,24 @@ let (app, resources) = adopt_stream(root, stream_data)?;
 
 pub fn ssr(locale: Locale) -> impl Widget {
     let content: Vec<Box<dyn Widget>> = vec![
-        Box::new(copy("docs-kicker", locale.text("ssr-server-rendering-adoption"))),
-        Box::new(heading(1, "docs-title", locale.text("ssr-ssr-and-hydration"))),
+        Box::new(copy(
+            "docs-kicker",
+            locale.text("ssr-server-rendering-adoption"),
+        )),
+        Box::new(heading(
+            1,
+            "docs-title",
+            locale.text("ssr-ssr-and-hydration"),
+        )),
         Box::new(copy(
             "docs-lead",
             locale.text("ssr-render-useful-html-on-the-server-then-let-the"),
         )),
         Box::new(view().class("docs-callout").fill((
-            copy("docs-callout-title", locale.text("display-widget-guide-title")),
+            copy(
+                "docs-callout-title",
+                locale.text("display-widget-guide-title"),
+            ),
             copy("", locale.text("display-widget-guide-body")),
             crate::components::link(
                 locale,
@@ -188,24 +198,60 @@ pub fn ssr(locale: Locale) -> impl Widget {
                 "text-link",
             ),
         ))),
-        Box::new(heading(2, "docs-heading", locale.text("ssr-start-with-ordinary-html"))),
+        Box::new(heading(
+            2,
+            "docs-heading",
+            locale.text("ssr-start-with-ordinary-html"),
+        )),
         Box::new(copy(
             "docs-paragraph",
             locale.text("ssr-use-ssr-render-for-a-fragment-and-ssr-render"),
         )),
-        Box::new(code_panel(locale, Theme::blue_dark(), "static_html.rs", PLAIN_HTML, "docs-code")),
+        Box::new(code_panel(
+            locale,
+            Theme::blue_dark(),
+            "static_html.rs",
+            PLAIN_HTML,
+            "docs-code",
+        )),
         Box::new(view().class("docs-callout").fill((
-            copy("docs-callout-title", locale.text("ssr-plain-html-is-not-hydratable")),
-            copy("", locale.text("ssr-choose-render-or-render-document-for-static-pages-do")),
+            copy(
+                "docs-callout-title",
+                locale.text("ssr-plain-html-is-not-hydratable"),
+            ),
+            copy(
+                "",
+                locale.text("ssr-choose-render-or-render-document-for-static-pages-do"),
+            ),
         ))),
-        Box::new(heading(2, "docs-heading", locale.text("ssr-create-an-adoptable-snapshot"))),
+        Box::new(heading(
+            2,
+            "docs-heading",
+            locale.text("ssr-create-an-adoptable-snapshot"),
+        )),
         Box::new(copy(
             "docs-paragraph",
             locale.text("ssr-snapshot-and-snapshot-with-wrap-the-mapper-output-in"),
         )),
-        Box::new(code_panel(locale, Theme::blue_dark(), "shared.rs", SHARED_COUNTER, "docs-code")),
-        Box::new(code_panel(locale, Theme::blue_dark(), "server.rs", SNAPSHOT_SERVER, "docs-code")),
-        Box::new(heading(2, "docs-heading", locale.text("ssr-hydrate-the-same-application"))),
+        Box::new(code_panel(
+            locale,
+            Theme::blue_dark(),
+            "shared.rs",
+            SHARED_COUNTER,
+            "docs-code",
+        )),
+        Box::new(code_panel(
+            locale,
+            Theme::blue_dark(),
+            "server.rs",
+            SNAPSHOT_SERVER,
+            "docs-code",
+        )),
+        Box::new(heading(
+            2,
+            "docs-heading",
+            locale.text("ssr-hydrate-the-same-application"),
+        )),
         Box::new(copy(
             "docs-paragraph",
             locale.text("ssr-in-the-wasm32-browser-host-call-web-hydrate-with"),
@@ -218,13 +264,20 @@ pub fn ssr(locale: Locale) -> impl Widget {
             "docs-code",
         )),
         Box::new(view().class("docs-callout").fill((
-            copy("docs-callout-title", locale.text("ssr-synchronous-ssr-does-not-await")),
+            copy(
+                "docs-callout-title",
+                locale.text("ssr-synchronous-ssr-does-not-await"),
+            ),
             copy(
                 "",
                 locale.text("ssr-render-snapshot-and-their-with-forms-construct-and-serialize"),
             ),
         ))),
-        Box::new(heading(2, "docs-heading", locale.text("ssr-transfer-resources-explicitly"))),
+        Box::new(heading(
+            2,
+            "docs-heading",
+            locale.text("ssr-transfer-resources-explicitly"),
+        )),
         Box::new(copy(
             "docs-paragraph",
             locale.text("ssr-the-optional-resources-feature-transfers-only-live-named-terminal"),
@@ -255,13 +308,20 @@ pub fn ssr(locale: Locale) -> impl Widget {
             "docs-code",
         )),
         Box::new(view().class("docs-callout").fill((
-            copy("docs-callout-title", locale.text("ssr-one-context-per-request")),
+            copy(
+                "docs-callout-title",
+                locale.text("ssr-one-context-per-request"),
+            ),
             copy(
                 "",
                 locale.text("ssr-never-share-a-resources-context-between-requests-or-applications"),
             ),
         ))),
-        Box::new(heading(2, "docs-heading", locale.text("ssr-stream-shell-patch-and-end"))),
+        Box::new(heading(
+            2,
+            "docs-heading",
+            locale.text("ssr-stream-shell-patch-and-end"),
+        )),
         Box::new(copy(
             "docs-paragraph",
             locale.text("ssr-with-the-native-stream-feature-ssr-stream-with-returns"),
@@ -285,10 +345,20 @@ pub fn ssr(locale: Locale) -> impl Widget {
             "docs-code",
         )),
         Box::new(view().class("docs-callout").fill((
-            copy("docs-callout-title", locale.text("ssr-wait-for-the-final-state")),
-            copy("", locale.text("ssr-a-streaming-shell-uses-temporary-stream-markers-and-is")),
+            copy(
+                "docs-callout-title",
+                locale.text("ssr-wait-for-the-final-state"),
+            ),
+            copy(
+                "",
+                locale.text("ssr-a-streaming-shell-uses-temporary-stream-markers-and-is"),
+            ),
         ))),
-        Box::new(heading(2, "docs-heading", locale.text("ssr-choose-the-rendering-path"))),
+        Box::new(heading(
+            2,
+            "docs-heading",
+            locale.text("ssr-choose-the-rendering-path"),
+        )),
         Box::new(view().class("docs-choice-table").fill((
             view().class("docs-choice-row docs-choice-header").fill((
                 copy("", locale.text("ssr-need")),
@@ -301,32 +371,59 @@ pub fn ssr(locale: Locale) -> impl Widget {
                 copy("", locale.text("ssr-plain-html-no-adoption")),
             )),
             view().class("docs-choice-row").fill((
-                copy("docs-choice-label", locale.text("ssr-interactive-initial-tree")),
+                copy(
+                    "docs-choice-label",
+                    locale.text("ssr-interactive-initial-tree"),
+                ),
                 copy("", locale.text("ssr-snapshot-snapshot-with")),
                 copy("", locale.text("ssr-hydrate-hydrate-with")),
             )),
             view().class("docs-choice-row").fill((
-                copy("docs-choice-label", locale.text("ssr-prefetched-named-data")),
-                copy("", locale.text("ssr-snapshot-resources-with-resource-script")),
+                copy(
+                    "docs-choice-label",
+                    locale.text("ssr-prefetched-named-data"),
+                ),
+                copy(
+                    "",
+                    locale.text("ssr-snapshot-resources-with-resource-script"),
+                ),
                 copy("", "hydrate_resources_with"),
             )),
             view().class("docs-choice-row").fill((
-                copy("docs-choice-label", locale.text("ssr-progressive-async-work")),
+                copy(
+                    "docs-choice-label",
+                    locale.text("ssr-progressive-async-work"),
+                ),
                 copy("", locale.text("ssr-stream-with-bootstrap")),
-                copy("", locale.text("ssr-hydrate-only-after-end-glory-stream-ready")),
+                copy(
+                    "",
+                    locale.text("ssr-hydrate-only-after-end-glory-stream-ready"),
+                ),
             )),
         ))),
-        Box::new(heading(2, "docs-heading", locale.text("ssr-common-pitfalls"))),
+        Box::new(heading(
+            2,
+            "docs-heading",
+            locale.text("ssr-common-pitfalls"),
+        )),
         Box::new(view().class("docs-pitfalls").fill((
             view().class("docs-pitfall").fill((
-                heading(3, "docs-card-title", locale.text("ssr-rebuilding-instead-of-adopting")),
+                heading(
+                    3,
+                    "docs-card-title",
+                    locale.text("ssr-rebuilding-instead-of-adopting"),
+                ),
                 copy(
                     "docs-paragraph",
                     locale.text("ssr-launch-requires-an-empty-mount-and-creates-a-new"),
                 ),
             )),
             view().class("docs-pitfall").fill((
-                heading(3, "docs-card-title", locale.text("ssr-changing-initial-inputs")),
+                heading(
+                    3,
+                    "docs-card-title",
+                    locale.text("ssr-changing-initial-inputs"),
+                ),
                 copy(
                     "docs-paragraph",
                     locale.text("ssr-a-different-factory-initial-cage-value-resource-name-schema"),
@@ -340,14 +437,22 @@ pub fn ssr(locale: Locale) -> impl Widget {
                 ),
             )),
             view().class("docs-pitfall").fill((
-                heading(3, "docs-card-title", locale.text("ssr-expecting-implicit-async-ssr")),
+                heading(
+                    3,
+                    "docs-card-title",
+                    locale.text("ssr-expecting-implicit-async-ssr"),
+                ),
                 copy(
                     "docs-paragraph",
                     locale.text("ssr-a-synchronous-snapshot-never-waits-for-a-future-use"),
                 ),
             )),
             view().class("docs-pitfall").fill((
-                heading(3, "docs-card-title", locale.text("ssr-nesting-the-data-block")),
+                heading(
+                    3,
+                    "docs-card-title",
+                    locale.text("ssr-nesting-the-data-block"),
+                ),
                 copy(
                     "docs-paragraph",
                     locale.text("ssr-keep-resource-script-output-outside-the-mount-hydration-owns"),
@@ -355,7 +460,10 @@ pub fn ssr(locale: Locale) -> impl Widget {
             )),
         ))),
         Box::new(view().class("docs-callout").fill((
-            copy("docs-callout-title", locale.text("ssr-bring-your-own-production-http-server")),
+            copy(
+                "docs-callout-title",
+                locale.text("ssr-bring-your-own-production-http-server"),
+            ),
             copy(
                 "",
                 locale.text("ssr-glory-supplies-rendering-frames-and-browser-bootstrap-assets-not"),

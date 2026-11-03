@@ -118,7 +118,10 @@ fn accepted_by_host(app: &glory::App, style: &Style) -> bool {
 
 pub fn styling(locale: Locale) -> impl Widget {
     let content: Vec<Box<dyn Widget>> = vec![
-        Box::new(copy("docs-kicker", locale.text("styling-style-presentation"))),
+        Box::new(copy(
+            "docs-kicker",
+            locale.text("styling-style-presentation"),
+        )),
         Box::new(heading(
             1,
             "docs-title",
@@ -129,7 +132,10 @@ pub fn styling(locale: Locale) -> impl Widget {
             locale.text("styling-choose-typed-style-values-for-portable-declarations-class-names"),
         )),
         Box::new(view().class("docs-callout").fill((
-            copy("docs-callout-title", locale.text("styling-replacement-not-accumulation")),
+            copy(
+                "docs-callout-title",
+                locale.text("styling-replacement-not-accumulation"),
+            ),
             copy(
                 "",
                 locale.text("styling-style-replaces-the-complete-typed-style-and-class-replaces"),
@@ -144,7 +150,13 @@ pub fn styling(locale: Locale) -> impl Widget {
             "docs-paragraph",
             locale.text("styling-style-has-explicit-rust-types-for-dimensions-flex-layout"),
         )),
-        Box::new(code_panel(locale, Theme::blue_dark(), "typed.rs", TYPED_STYLE, "docs-code")),
+        Box::new(code_panel(
+            locale,
+            Theme::blue_dark(),
+            "typed.rs",
+            TYPED_STYLE,
+            "docs-code",
+        )),
         Box::new(code_panel(
             locale,
             Theme::blue_dark(),
@@ -153,7 +165,10 @@ pub fn styling(locale: Locale) -> impl Widget {
             "docs-code",
         )),
         Box::new(view().class("docs-callout").fill((
-            copy("docs-callout-title", locale.text("display-widget-guide-title")),
+            copy(
+                "docs-callout-title",
+                locale.text("display-widget-guide-title"),
+            ),
             copy("", locale.text("display-widget-guide-body")),
             crate::components::link(
                 locale,
@@ -162,12 +177,22 @@ pub fn styling(locale: Locale) -> impl Widget {
                 "text-link",
             ),
         ))),
-        Box::new(heading(2, "docs-heading", locale.text("styling-use-classes-with-external-css"))),
+        Box::new(heading(
+            2,
+            "docs-heading",
+            locale.text("styling-use-classes-with-external-css"),
+        )),
         Box::new(copy(
             "docs-paragraph",
             locale.text("styling-classes-connect-semantic-nodes-to-the-surrounding-document-s"),
         )),
-        Box::new(code_panel(locale, Theme::blue_dark(), "app.css", EXTERNAL_CSS, "docs-code")),
+        Box::new(code_panel(
+            locale,
+            Theme::blue_dark(),
+            "app.css",
+            EXTERNAL_CSS,
+            "docs-code",
+        )),
         Box::new(code_panel(
             locale,
             Theme::blue_dark(),
@@ -175,12 +200,22 @@ pub fn styling(locale: Locale) -> impl Widget {
             EXTERNAL_WIDGET,
             "docs-code",
         )),
-        Box::new(heading(2, "docs-heading", locale.text("styling-parse-a-bounded-sheet"))),
+        Box::new(heading(
+            2,
+            "docs-heading",
+            locale.text("styling-parse-a-bounded-sheet"),
+        )),
         Box::new(copy(
             "docs-paragraph",
             locale.text("styling-enable-glory-s-css-feature-to-parse-an-immutable"),
         )),
-        Box::new(code_panel(locale, Theme::blue_dark(), "sheet.rs", SHEET, "docs-code")),
+        Box::new(code_panel(
+            locale,
+            Theme::blue_dark(),
+            "sheet.rs",
+            SHEET,
+            "docs-code",
+        )),
         Box::new(copy(
             "docs-paragraph",
             locale.text("styling-the-example-uses-ssr-css-render-document-checks-and"),
@@ -194,7 +229,13 @@ pub fn styling(locale: Locale) -> impl Widget {
             "docs-paragraph",
             locale.text("styling-maximum-sizes-use-limit-not-length-option-none-means"),
         )),
-        Box::new(code_panel(locale, Theme::blue_dark(), "limits.rs", LIMITS, "docs-code")),
+        Box::new(code_panel(
+            locale,
+            Theme::blue_dark(),
+            "limits.rs",
+            LIMITS,
+            "docs-code",
+        )),
         Box::new(heading(
             2,
             "docs-heading",
@@ -204,22 +245,42 @@ pub fn styling(locale: Locale) -> impl Widget {
             "docs-paragraph",
             locale.text("styling-each-renderer-exposes-an-immutable-style-profile-for-the"),
         )),
-        Box::new(code_panel(locale, Theme::blue_dark(), "profiles.rs", PROFILE, "docs-code")),
+        Box::new(code_panel(
+            locale,
+            Theme::blue_dark(),
+            "profiles.rs",
+            PROFILE,
+            "docs-code",
+        )),
         Box::new(view().class("docs-callout").fill((
             copy(
                 "docs-callout-title",
                 locale.text("styling-portable-values-are-not-identical-pixels"),
             ),
-            copy("", locale.text("styling-a-declaration-accepted-by-two-hosts-can-still-resolve")),
+            copy(
+                "",
+                locale.text("styling-a-declaration-accepted-by-two-hosts-can-still-resolve"),
+            ),
         ))),
-        Box::new(heading(2, "docs-heading", locale.text("styling-sapid-heading"))),
-        Box::new(copy("docs-paragraph", locale.text("styling-sapid-description"))),
+        Box::new(heading(
+            2,
+            "docs-heading",
+            locale.text("styling-sapid-heading"),
+        )),
+        Box::new(copy(
+            "docs-paragraph",
+            locale.text("styling-sapid-description"),
+        )),
         Box::new(external(
             locale.text("styling-sapid-link"),
             crate::navigation::SAPID_URL,
             "text-link",
         )),
-        Box::new(doc_nav(locale, Some(Route::CustomWidgets), Some(Route::I18n))),
+        Box::new(doc_nav(
+            locale,
+            Some(Route::CustomWidgets),
+            Some(Route::I18n),
+        )),
     ];
     docs_layout(locale, Route::Styling, view().fill(content))
 }

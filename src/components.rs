@@ -6,11 +6,17 @@ use glory::render::{Current, Role};
 use sapid::Theme;
 
 pub fn copy(class: &str, content: impl Into<Vary<String>>) -> impl Widget {
-    sapid::text().unstyled().class(class.to_owned()).content(content)
+    sapid::text()
+        .unstyled()
+        .class(class.to_owned())
+        .content(content)
 }
 
 pub fn heading(level: u8, class: &str, content: impl Into<String>) -> impl Widget {
-    sapid::title(level).unstyled().class(class.to_owned()).content(content.into())
+    sapid::title(level)
+        .unstyled()
+        .class(class.to_owned())
+        .content(content.into())
 }
 
 pub fn link(locale: Locale, label: impl Into<String>, route: Route, class: &str) -> sapid::Anchor {
@@ -23,7 +29,11 @@ pub fn link(locale: Locale, label: impl Into<String>, route: Route, class: &str)
 }
 
 pub fn external(label: impl Into<String>, href: &str, class: &str) -> sapid::Anchor {
-    sapid::anchor().unstyled().href(href.to_owned()).label(label.into()).class(class.to_owned())
+    sapid::anchor()
+        .unstyled()
+        .href(href.to_owned())
+        .label(label.into())
+        .class(class.to_owned())
 }
 
 fn language_picker(locale: Locale, page: Route) -> impl Widget {
@@ -60,7 +70,10 @@ fn language_picker(locale: Locale, page: Route) -> impl Widget {
                 }),
         );
     }
-    view().name(locale.text("language-menu")).class("language-picker").fill(menu)
+    view()
+        .name(locale.text("language-menu"))
+        .class("language-picker")
+        .fill(menu)
 }
 
 fn nav_link(
@@ -73,7 +86,11 @@ fn nav_link(
     let active = current == route;
     let class = format!(
         "{}{}",
-        if mobile { "mobile-nav-link" } else { "nav-link" },
+        if mobile {
+            "mobile-nav-link"
+        } else {
+            "nav-link"
+        },
         if active { " is-active" } else { "" }
     );
     link(locale, label, route, &class).current(if active { Some(Current::Page) } else { None })
@@ -82,16 +99,25 @@ fn nav_link(
 fn primary_links(locale: Locale, current: Route, mobile: bool) -> Vec<Box<dyn Widget>> {
     let in_docs = navigation::is_documentation(current);
     let section = if in_docs { Route::Docs } else { current };
-    let docs = nav_link(locale, locale.text("common-docs"), Route::Docs, section, mobile).current(
-        if !in_docs {
-            None
-        } else if current == Route::Docs {
-            Some(Current::Page)
-        } else {
-            Some(Current::Location)
-        },
-    );
-    let class = if mobile { "mobile-nav-link" } else { "nav-link" };
+    let docs = nav_link(
+        locale,
+        locale.text("common-docs"),
+        Route::Docs,
+        section,
+        mobile,
+    )
+    .current(if !in_docs {
+        None
+    } else if current == Route::Docs {
+        Some(Current::Page)
+    } else {
+        Some(Current::Location)
+    });
+    let class = if mobile {
+        "mobile-nav-link"
+    } else {
+        "nav-link"
+    };
     vec![
         Box::new(docs),
         Box::new(external(locale.text("navigation-api"), API_URL, class)),
@@ -102,12 +128,13 @@ fn primary_links(locale: Locale, current: Route, mobile: bool) -> Vec<Box<dyn Wi
 pub fn header(locale: Locale, current: Route) -> impl Widget {
     widget(move |scope| {
         let open = scope.cage(false);
-        let menu_label =
-            open.map(
-                move |open| {
-                    if *open { locale.text("common-close") } else { locale.text("common-menu") }
-                },
-            );
+        let menu_label = open.map(move |open| {
+            if *open {
+                locale.text("common-close")
+            } else {
+                locale.text("common-menu")
+            }
+        });
         view()
             .role(Role::Banner)
             .class("site-header")
@@ -161,10 +188,16 @@ pub fn footer(locale: Locale) -> impl Widget {
     view().role(Role::ContentInfo).class("site-footer").fill((
         view().class("footer-inner").fill((
             view().class("footer-brand").fill((
-                image().source(crate::assets::media("glory.svg")).decorative().class("footer-mark"),
+                image()
+                    .source(crate::assets::media("glory.svg"))
+                    .decorative()
+                    .class("footer-mark"),
                 view().fill((
                     copy("footer-title", "Glory"),
-                    copy("footer-tagline", locale.text("common-semantic-ui-handwritten-in-rust")),
+                    copy(
+                        "footer-tagline",
+                        locale.text("common-semantic-ui-handwritten-in-rust"),
+                    ),
                 )),
             )),
             view().class("footer-links").fill((
@@ -185,8 +218,18 @@ pub fn footer(locale: Locale) -> impl Widget {
                 )),
                 view().fill((
                     copy("footer-heading", locale.text("common-rendering")),
-                    link(locale, locale.text("common-ssr-hydration"), Route::Ssr, "footer-link"),
-                    link(locale, locale.text("common-platforms"), Route::Platforms, "footer-link"),
+                    link(
+                        locale,
+                        locale.text("common-ssr-hydration"),
+                        Route::Ssr,
+                        "footer-link",
+                    ),
+                    link(
+                        locale,
+                        locale.text("common-platforms"),
+                        Route::Platforms,
+                        "footer-link",
+                    ),
                 )),
             )),
         )),
@@ -204,7 +247,14 @@ pub fn code_panel(
     source: &str,
     class: &str,
 ) -> impl Widget {
-    source_panel(locale, theme, name, source, class, sapid::CodeLanguage::Rust)
+    source_panel(
+        locale,
+        theme,
+        name,
+        source,
+        class,
+        sapid::CodeLanguage::Rust,
+    )
 }
 
 pub fn source_panel(
@@ -234,9 +284,10 @@ pub fn source_panel(
 }
 
 pub fn feature(content: impl Into<String>) -> impl Widget {
-    view()
-        .class("feature-item")
-        .fill((copy("feature-check", "✓"), copy("feature-copy", content.into())))
+    view().class("feature-item").fill((
+        copy("feature-check", "✓"),
+        copy("feature-copy", content.into()),
+    ))
 }
 
 pub fn doc_nav(locale: Locale, previous: Option<Route>, next: Option<Route>) -> impl Widget {
@@ -263,7 +314,10 @@ pub fn doc_nav(locale: Locale, previous: Option<Route>, next: Option<Route>) -> 
 pub fn docs_layout(locale: Locale, current: Route, content: impl Widget) -> impl Widget {
     let mut navigation: Vec<Box<dyn Widget>> = Vec::new();
     for group in navigation::DOC_GROUPS {
-        navigation.push(Box::new(copy("docs-sidebar-title", locale.text(group.title))));
+        navigation.push(Box::new(copy(
+            "docs-sidebar-title",
+            locale.text(group.title),
+        )));
         for chapter in group.chapters {
             navigation.push(Box::new(nav_link(
                 locale,
@@ -274,7 +328,11 @@ pub fn docs_layout(locale: Locale, current: Route, content: impl Widget) -> impl
             )));
         }
     }
-    navigation.push(Box::new(external(locale.text("navigation-api"), API_URL, "nav-link")));
+    navigation.push(Box::new(external(
+        locale.text("navigation-api"),
+        API_URL,
+        "nav-link",
+    )));
     navigation.push(Box::new(external(
         locale.text("navigation-sapid-library"),
         SAPID_URL,
@@ -298,8 +356,12 @@ pub fn documentation_map(locale: Locale) -> impl Widget {
                 .chapters
                 .iter()
                 .map(|chapter| {
-                    Box::new(link(locale, locale.text(chapter.label), chapter.route, "text-link"))
-                        as Box<dyn Widget>
+                    Box::new(link(
+                        locale,
+                        locale.text(chapter.label),
+                        chapter.route,
+                        "text-link",
+                    )) as Box<dyn Widget>
                 })
                 .collect();
             Box::new(view().class("docs-map-card").fill((

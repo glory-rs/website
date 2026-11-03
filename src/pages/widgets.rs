@@ -148,7 +148,8 @@ fn results(loading: Cage<bool>, ids: Cage<Vec<u64>>) -> impl Widget {
 }"#;
 
 pub fn widgets(locale: Locale) -> impl Widget {
-    let content: Vec<Box<dyn Widget>> = vec![
+    let content: Vec<Box<dyn Widget>> =
+        vec![
         Box::new(copy("docs-kicker", locale.text("widgets-the-semantic-toolbox"))),
         Box::new(heading(1, "docs-title", locale.text("widgets-compose-with-built-in-widgets"))),
         Box::new(copy(

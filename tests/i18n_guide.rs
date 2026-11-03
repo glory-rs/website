@@ -53,7 +53,14 @@ fn displayed_catalog_example_resolves_parameters_and_plural_categories() {
     for tag in ["en", "zh-CN"] {
         let locale: Locale = tag.parse().unwrap();
         let greeting = plain(&i18n_catalog::greeting(&catalog, &locale, "Ada").unwrap());
-        assert_eq!(greeting, if tag == "en" { "Hello, Ada!" } else { "你好，Ada！" });
+        assert_eq!(
+            greeting,
+            if tag == "en" {
+                "Hello, Ada!"
+            } else {
+                "你好，Ada！"
+            }
+        );
         for count in [0, 1, 2] {
             let mut args = Args::new();
             args.set("count", count);
@@ -77,7 +84,8 @@ fn displayed_catalog_example_resolves_parameters_and_plural_categories() {
 #[test]
 fn displayed_widget_switches_language_without_resetting_its_count() {
     let app = App::memory();
-    app.mount(i18n_shared::language_demo("en".parse().unwrap())).unwrap();
+    app.mount(i18n_shared::language_demo("en".parse().unwrap()))
+        .unwrap();
     assert_eq!(message(&app), "You have one message.");
     click(&app, "Add a message");
     assert_eq!(message(&app), "You have 2 messages.");
@@ -91,9 +99,10 @@ fn displayed_widget_switches_language_without_resetting_its_count() {
 
 #[test]
 fn displayed_server_example_uses_the_shared_url_policy_and_snapshot() {
-    for (path, tag, text) in
-        [("/demo", "en", "You have one message."), ("/zh/demo", "zh-CN", "你有")]
-    {
+    for (path, tag, text) in [
+        ("/demo", "en", "You have one message."),
+        ("/zh/demo", "zh-CN", "你有"),
+    ] {
         let html = i18n_server::render_page(path).unwrap();
         assert!(html.contains(&format!("<html lang=\"{tag}\">")));
         assert!(html.contains(text));
@@ -101,7 +110,10 @@ fn displayed_server_example_uses_the_shared_url_policy_and_snapshot() {
         assert!(html.contains("/app.js"));
     }
     assert_eq!(i18n_shared::locale_for_path("/zh").to_string(), "zh-CN");
-    assert_eq!(i18n_shared::locale_for_path("/zh/demo?lang=en#preview").to_string(), "zh-CN");
+    assert_eq!(
+        i18n_shared::locale_for_path("/zh/demo?lang=en#preview").to_string(),
+        "zh-CN"
+    );
     assert_eq!(i18n_shared::locale_for_path("/zh-other").to_string(), "en");
 }
 
@@ -121,7 +133,11 @@ fn both_guide_routes_include_examples_and_localized_navigation() {
         ] {
             assert!(html.contains(marker), "{marker}");
         }
-        let prefix = if locale == glory_website::Locale::En { "" } else { "/zh" };
+        let prefix = if locale == glory_website::Locale::En {
+            ""
+        } else {
+            "/zh"
+        };
         for path in ["i18n", "styling", "web"] {
             assert!(html.contains(&format!("href=\"{prefix}/docs/{path}/\"")));
         }

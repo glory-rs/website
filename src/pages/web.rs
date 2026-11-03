@@ -109,14 +109,24 @@ APP.with(|slot| *slot.borrow_mut() = Some(app));"#;
 
 pub fn web(locale: Locale) -> impl Widget {
     let content: Vec<Box<dyn Widget>> = vec![
-        Box::new(copy("docs-kicker", locale.text("architecture-the-glory-guide"))),
-        Box::new(heading(1, "docs-title", locale.text("web-web-applications"))),
+        Box::new(copy(
+            "docs-kicker",
+            locale.text("architecture-the-glory-guide"),
+        )),
+        Box::new(heading(
+            1,
+            "docs-title",
+            locale.text("web-web-applications"),
+        )),
         Box::new(copy(
             "docs-lead",
             locale.text("web-a-glory-browser-application-is-a-wasm32-rust-library"),
         )),
         Box::new(view().class("docs-callout").fill((
-            copy("docs-callout-title", locale.text("display-widget-guide-title")),
+            copy(
+                "docs-callout-title",
+                locale.text("display-widget-guide-title"),
+            ),
             copy("", locale.text("display-widget-guide-body")),
             crate::components::link(
                 locale,
@@ -125,25 +135,51 @@ pub fn web(locale: Locale) -> impl Widget {
                 "text-link",
             ),
         ))),
-        Box::new(heading(2, "docs-heading", locale.text("web-select-the-wasm32-web-feature"))),
+        Box::new(heading(
+            2,
+            "docs-heading",
+            locale.text("web-select-the-wasm32-web-feature"),
+        )),
         Box::new(copy(
             "docs-paragraph",
             locale.text("web-enable-glory-s-web-feature-for-a-dom-application"),
         )),
-        Box::new(code_panel(locale, Theme::blue_dark(), "Cargo.toml", CARGO, "docs-code")),
+        Box::new(code_panel(
+            locale,
+            Theme::blue_dark(),
+            "Cargo.toml",
+            CARGO,
+            "docs-code",
+        )),
         Box::new(copy(
             "docs-paragraph",
             locale.text("web-the-cdylib-output-is-the-wasm-library-loaded-by"),
         )),
-        Box::new(heading(2, "docs-heading", locale.text("web-find-the-root-and-call-launch"))),
+        Box::new(heading(
+            2,
+            "docs-heading",
+            locale.text("web-find-the-root-and-call-launch"),
+        )),
         Box::new(copy(
             "docs-paragraph",
             locale.text("web-launch-root-widget-mounts-an-already-constructed-widget-into"),
         )),
-        Box::new(code_panel(locale, Theme::blue_dark(), "src/web.rs", START, "docs-code")),
+        Box::new(code_panel(
+            locale,
+            Theme::blue_dark(),
+            "src/web.rs",
+            START,
+            "docs-code",
+        )),
         Box::new(view().class("docs-callout").fill((
-            copy("docs-callout-title", locale.text("web-webapp-is-a-lifetime-guard")),
-            copy("", locale.text("web-do-not-let-the-returned-webapp-fall-out-of")),
+            copy(
+                "docs-callout-title",
+                locale.text("web-webapp-is-a-lifetime-guard"),
+            ),
+            copy(
+                "",
+                locale.text("web-do-not-let-the-returned-webapp-fall-out-of"),
+            ),
         ))),
         Box::new(heading(
             2,
@@ -165,25 +201,51 @@ pub fn web(locale: Locale) -> impl Widget {
             "docs-paragraph",
             locale.text("web-both-functions-return-result-webapp-the-factory-form-is"),
         )),
-        Box::new(heading(2, "docs-heading", locale.text("web-the-csr-mount-must-be-empty"))),
+        Box::new(heading(
+            2,
+            "docs-heading",
+            locale.text("web-the-csr-mount-must-be-empty"),
+        )),
         Box::new(copy(
             "docs-paragraph",
             locale.text("web-launch-and-launch-with-require-an-empty-unclaimed-root"),
         )),
-        Box::new(code_panel(locale, Theme::blue_dark(), "index.html", HTML, "docs-code")),
+        Box::new(code_panel(
+            locale,
+            Theme::blue_dark(),
+            "index.html",
+            HTML,
+            "docs-code",
+        )),
         Box::new(copy(
             "docs-paragraph",
             locale.text("web-the-module-imports-the-javascript-generated-by-wasm-bindgen"),
         )),
-        Box::new(heading(2, "docs-heading", locale.text("web-build-bindings-and-serve-over-http"))),
+        Box::new(heading(
+            2,
+            "docs-heading",
+            locale.text("web-build-bindings-and-serve-over-http"),
+        )),
         Box::new(copy(
             "docs-paragraph",
             locale.text("web-compile-the-library-to-wasm-run-wasm-bindgen-with"),
         )),
-        Box::new(code_panel(locale, Theme::blue_dark(), "terminal", BUILD, "docs-code")),
+        Box::new(code_panel(
+            locale,
+            Theme::blue_dark(),
+            "terminal",
+            BUILD,
+            "docs-code",
+        )),
         Box::new(view().class("docs-callout").fill((
-            copy("docs-callout-title", locale.text("web-do-not-open-index-html-with-file")),
-            copy("", locale.text("web-es-module-and-wasm-loading-require-a-proper-http")),
+            copy(
+                "docs-callout-title",
+                locale.text("web-do-not-open-index-html-with-file"),
+            ),
+            copy(
+                "",
+                locale.text("web-es-module-and-wasm-loading-require-a-proper-http"),
+            ),
         ))),
         Box::new(heading(
             2,
@@ -198,7 +260,13 @@ pub fn web(locale: Locale) -> impl Widget {
             "docs-paragraph",
             locale.text("web-put-the-shared-widget-factory-in-code-compiled-for"),
         )),
-        Box::new(code_panel(locale, Theme::blue_dark(), "src/app.rs", SHARED_APP, "docs-code")),
+        Box::new(code_panel(
+            locale,
+            Theme::blue_dark(),
+            "src/app.rs",
+            SHARED_APP,
+            "docs-code",
+        )),
         Box::new(heading(
             2,
             "docs-heading",
@@ -208,7 +276,13 @@ pub fn web(locale: Locale) -> impl Widget {
             "docs-paragraph",
             locale.text("web-glory-ssr-snapshot-app-returns-a-snapshot-whose-html"),
         )),
-        Box::new(code_panel(locale, Theme::blue_dark(), "src/server.rs", SSR, "docs-code")),
+        Box::new(code_panel(
+            locale,
+            Theme::blue_dark(),
+            "src/server.rs",
+            SSR,
+            "docs-code",
+        )),
         Box::new(copy(
             "docs-paragraph",
             locale.text("web-glory-ssr-render-is-appropriate-when-you-only-need"),
@@ -222,7 +296,13 @@ pub fn web(locale: Locale) -> impl Widget {
             "docs-paragraph",
             locale.text("web-use-hydrate-root-widget-or-hydrate-with-root-factory"),
         )),
-        Box::new(code_panel(locale, Theme::blue_dark(), "src/web.rs", HYDRATE, "docs-code")),
+        Box::new(code_panel(
+            locale,
+            Theme::blue_dark(),
+            "src/web.rs",
+            HYDRATE,
+            "docs-code",
+        )),
         Box::new(copy(
             "docs-paragraph",
             locale.text("web-the-hydrate-with-factory-has-the-same-fnonce-scope"),
@@ -234,8 +314,14 @@ pub fn web(locale: Locale) -> impl Widget {
             "text-link",
         )),
         Box::new(view().class("docs-callout").fill((
-            copy("docs-callout-title", locale.text("web-the-complete-startup-contract")),
-            copy("", locale.text("web-build-for-wasm32-with-web-look-up-a-web")),
+            copy(
+                "docs-callout-title",
+                locale.text("web-the-complete-startup-contract"),
+            ),
+            copy(
+                "",
+                locale.text("web-build-for-wasm32-with-web-look-up-a-web"),
+            ),
         ))),
         Box::new(doc_nav(locale, Some(Route::I18n), Some(Route::Ssr))),
     ];

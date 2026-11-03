@@ -41,7 +41,12 @@ impl Locale {
         }
     }
     pub fn context(self) -> I18n {
-        I18n::new(catalog(), self.tag().parse::<glory::i18n::Locale>().expect("static locale"))
+        I18n::new(
+            catalog(),
+            self.tag()
+                .parse::<glory::i18n::Locale>()
+                .expect("static locale"),
+        )
     }
     pub fn text(self, key: &str) -> String {
         self.format(key, None)

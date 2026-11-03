@@ -15,8 +15,14 @@ fn output_path(directory: &Path, route: SiteRoute) -> PathBuf {
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
-    let directory = PathBuf::from(std::env::args().nth(1).ok_or("Expected an output directory")?);
-    let assets = std::env::args().nth(2).ok_or("Expected an immutable asset directory")?;
+    let directory = PathBuf::from(
+        std::env::args()
+            .nth(1)
+            .ok_or("Expected an output directory")?,
+    );
+    let assets = std::env::args()
+        .nth(2)
+        .ok_or("Expected an immutable asset directory")?;
     if !assets.starts_with("assets-")
         || assets.len() != 27
         || !assets[7..].bytes().all(|b| b.is_ascii_hexdigit())
@@ -34,14 +40,20 @@ fn main() -> Result<(), Box<dyn Error>> {
             let snapshot = glory::ssr::snapshot(app(route))?;
             let path = output_path(&directory, route);
             fs::create_dir_all(path.parent().ok_or("Expected parent directory")?)?;
-            fs::write(&path, metadata::document_with_assets(route, &snapshot.html, &assets))?;
+            fs::write(
+                &path,
+                metadata::document_with_assets(route, &snapshot.html, &assets),
+            )?;
             println!("Generated {}", path.display());
         }
     }
     fs::write(directory.join("sitemap.xml"), metadata::sitemap())?;
     fs::write(
         directory.join("robots.txt"),
-        format!("User-agent: *\nAllow: /\nSitemap: {}/sitemap.xml\n", metadata::ORIGIN),
+        format!(
+            "User-agent: *\nAllow: /\nSitemap: {}/sitemap.xml\n",
+            metadata::ORIGIN
+        ),
     )?;
     Ok(())
 }

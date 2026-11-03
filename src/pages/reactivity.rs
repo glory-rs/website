@@ -18,7 +18,11 @@ count.revise(|value| *value += 1);"#;
 pub fn reactivity(locale: Locale) -> impl Widget {
     let content: Vec<Box<dyn Widget>> = vec![
         Box::new(copy("docs-kicker", locale.text("reactivity-state-updates"))),
-        Box::new(heading(1, "docs-title", locale.text("reactivity-fine-grained-reactivity"))),
+        Box::new(heading(
+            1,
+            "docs-title",
+            locale.text("reactivity-fine-grained-reactivity"),
+        )),
         Box::new(copy(
             "docs-lead",
             locale.text("reactivity-cage-bond-and-vary-make-data-flow-explicit-values"),
@@ -71,7 +75,11 @@ pub fn reactivity(locale: Locale) -> impl Widget {
             REACTIVE_CODE,
             "docs-code",
         )),
-        Box::new(heading(2, "docs-heading", locale.text("reactivity-try-a-live-widget"))),
+        Box::new(heading(
+            2,
+            "docs-heading",
+            locale.text("reactivity-try-a-live-widget"),
+        )),
         Box::new(copy(
             "docs-paragraph",
             locale.text("reactivity-this-counter-is-running-through-glory-s-browser-host"),
@@ -86,7 +94,11 @@ pub fn reactivity(locale: Locale) -> impl Widget {
             "docs-paragraph",
             locale.text("reactivity-dropping-a-scope-invalidates-its-handles-and-cancels-owned"),
         )),
-        Box::new(doc_nav(locale, Some(Route::Architecture), Some(Route::Display))),
+        Box::new(doc_nav(
+            locale,
+            Some(Route::Architecture),
+            Some(Route::Display),
+        )),
     ];
     docs_layout(locale, Route::Reactivity, view().fill(content))
 }

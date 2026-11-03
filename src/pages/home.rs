@@ -66,7 +66,9 @@ pub(crate) fn counter(locale: Locale) -> impl Widget {
 fn browser_preview(locale: Locale, content: impl Widget) -> impl Widget {
     view().class("browser-preview").fill((
         view().class("browser-chrome").fill((
-            view().class("browser-dots").fill((copy("", "●"), copy("", "●"), copy("", "●"))),
+            view()
+                .class("browser-dots")
+                .fill((copy("", "●"), copy("", "●"), copy("", "●"))),
             copy("browser-address", locale.text("home-live-example")),
         )),
         view().class("browser-content").fill(content),
